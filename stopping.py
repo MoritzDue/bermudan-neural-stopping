@@ -200,7 +200,7 @@ def validation_put() -> Option:
                   sigma=0.20, maturity=1.0, dates=9)
 
 
-ROLES = {"train": 1, "val": 2, "test": 3, "holdout": 4, "init": 5, "fresh": 6, "check": 7}
+ROLES = {"train": 1, "val": 2, "test": 3, "holdout": 4, "init": 5, "fresh": 6, "check": 7, "dual_outer": 8, "dual_inner": 9}
 
 
 def seed_for(base: int, role: str, d: int, seed: int = 0, extra: int = 0) -> int:
