@@ -1,0 +1,124 @@
+{
+  "frozen": {
+    "mode": "quick",
+    "study": {
+      "budgets": [
+        500,
+        2000
+      ],
+      "seeds": [
+        0,
+        1
+      ],
+      "ablation_budgets": [
+        500,
+        2000
+      ],
+      "val": 1000,
+      "test": 20000,
+      "case_2d": {
+        "budget": 2000,
+        "seeds": [
+          0,
+          1
+        ]
+      },
+      "case_10d": {
+        "budget": 2000,
+        "seeds": [
+          0
+        ]
+      }
+    },
+    "neural": {
+      "sorted_inputs": true,
+      "payoff_input": true,
+      "max_steps": 150,
+      "lr": 0.003,
+      "batch": 256,
+      "width_extra": 40,
+      "batch_norm": true,
+      "eval_every": 0,
+      "fresh_paths": false
+    },
+    "lsm_grid": {
+      "degrees": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "ridges": [
+        1e-06,
+        0.0001,
+        0.01
+      ]
+    },
+    "base_seed": 2026,
+    "include_10d": false,
+    "variants": {
+      "sorted+payoff": [
+        true,
+        true
+      ],
+      "raw+payoff": [
+        false,
+        true
+      ],
+      "sorted": [
+        true,
+        false
+      ],
+      "raw": [
+        false,
+        false
+      ]
+    },
+    "contracts": {
+      "5": {
+        "kind": "max_call",
+        "d": 5,
+        "s0": 100,
+        "strike": 100,
+        "rate": 0.05,
+        "dividend": 0.1,
+        "sigma": 0.2,
+        "rho": 0.0,
+        "maturity": 3.0,
+        "dates": 9
+      },
+      "2": {
+        "kind": "max_call",
+        "d": 2,
+        "s0": 100,
+        "strike": 100,
+        "rate": 0.05,
+        "dividend": 0.1,
+        "sigma": 0.2,
+        "rho": 0.0,
+        "maturity": 3.0,
+        "dates": 9
+      }
+    },
+    "code_hash": "ec33ff7c866fba60",
+    "accept_restricted_budget": false,
+    "budget_label": "restricted optimisation budget",
+    "blocking_cells": [
+      "raw+payoff@2000",
+      "sorted+payoff@2000"
+    ]
+  },
+  "environment": {
+    "threads": {
+      "torch_threads": 1,
+      "blas": [
+        "openmp:1",
+        "openblas:1",
+        "openblas:1"
+      ]
+    },
+    "numpy": "2.5.3",
+    "torch": "2.15.0+cu132"
+  },
+  "development_cost_cpu_minutes": 0.5816543355666677
+}
