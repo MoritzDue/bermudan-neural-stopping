@@ -1,7 +1,8 @@
-numpy>=1.26,<3
-scipy>=1.11,<2
-pandas>=2.0,<3
-matplotlib>=3.8,<4
-torch>=2.2,<3
-threadpoolctl>=3.1,<4
-ipykernel>=6.29,<8
+--extra-index-url https://download.pytorch.org/whl/cpu
+numpy==2.5.4
+scipy==1.18.1
+pandas==2.3.3
+matplotlib==3.11.2
+torch==2.15.0+cpu
+threadpoolctl==3.7.0
+ipykernel==7.4.0

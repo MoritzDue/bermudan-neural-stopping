@@ -24,6 +24,8 @@ Conventions
 from __future__ import annotations
 
 import json
+import hashlib
+import os
 import math
 import time
 from dataclasses import asdict, dataclass, field, replace
@@ -103,8 +105,17 @@ VARIANTS = {
 MAIN_VARIANT = "sorted+payoff"
 
 
+PROJECT_ROOT = Path(__file__).resolve().parent
+
+
 def results_dir(mode: str) -> Path:
-    path = Path("results") / mode
+    """Project-anchored outputs; notebook tools may override the results root.
+
+    BERMUDAN_RESULTS_ROOT names the directory containing quick/full, not the mode.
+    """
+    if mode not in CONFIG:
+        raise ValueError("mode must be quick or full")
+    path = Path(os.environ.get("BERMUDAN_RESULTS_ROOT", PROJECT_ROOT / "results")) / mode
     path.mkdir(parents=True, exist_ok=True)
     return path
 
@@ -230,26 +241,57 @@ def crr_bermudan_put(opt: Option, steps_per_date: int = 160) -> float:
     return float(v[0])
 
 
-# Becker, Cheridito & Jentzen (2019), Table 1 (symmetric case, s0 = 100).
+def convolution_bermudan_put(opt: Option, spacing: float = 0.0005) -> float:
+    """Independent log-grid backward induction using the exact Gaussian kernel.
+
+    Trapezoid convolution on log(S/S0) in [-3,3]. Boundary truncation is
+    negligible for validation_put; this is a numerical cross-check, not a bound.
+    Exercise at dates 1..N only. Grid refinement must be checked separately.
+    """
+    from scipy.signal import fftconvolve
+    if opt.kind != "put" or opt.sigma <= 0:
+        raise ValueError("requires a positive-volatility 1D put")
+    n = int(math.ceil(3 / spacing))
+    x = np.arange(-n, n + 1) * spacing
+    sd = opt.sigma * math.sqrt(opt.dt)
+    drift = (opt.rate - opt.dividend - opt.sigma ** 2 / 2) * opt.dt
+    # Convolution reverses the increment: kernel(t) = density(-t).
+    kernel = np.exp(-0.5 * ((x + drift) / sd) ** 2) / (sd * math.sqrt(2 * math.pi)) * spacing
+    g = np.maximum(opt.strike - opt.s0 * np.exp(x), 0)
+    v = g.copy()
+    for k in range(opt.dates - 1, -1, -1):
+        v = math.exp(-opt.rate * opt.dt) * fftconvolve(v, kernel, mode="same")
+        if k > 0:
+            v = np.maximum(v, g)
+    return float(v[n])
+
+
+# BCJ Table 1, transcribed from the Director brief; primary PDF unavailable offline.
+# value/low/high remain compatibility aliases for the midpoint and DOS CI.
 PAPER_REFERENCES = {
-    2: dict(value=13.902, low=13.880, high=13.910,
-            source="Table 1, d=2: binomial value 13.902; DOS 95% CI [13.880, 13.910]"),
-    5: dict(value=26.159, low=26.138, high=26.174,
-            source="Table 1, d=5: point estimate 26.159; 95% CI [26.138, 26.174]"),
-    10: dict(value=38.337, low=38.300, high=38.367,
-             source="Table 1, d=10: point estimate 38.337; 95% CI [38.300, 38.367]"),
+    2: dict(value=13.899, lower=13.895, upper=13.903, midpoint=13.899,
+            low=13.880, high=13.910, ci=[13.880, 13.910], lattice=13.902,
+            source="BCJ Table 1, d=2; brief transcription, primary source unverified offline"),
+    5: dict(value=26.159, lower=26.156, upper=26.162, midpoint=26.159,
+            low=26.138, high=26.174, ci=[26.138, 26.174], lattice=None,
+            source="BCJ Table 1, d=5; brief transcription, primary source unverified offline"),
+    10: dict(value=38.337, low=38.300, high=38.367, verified=False,
+             source="Unverified legacy 10D fields; out of scope, not a research benchmark"),
 }
 
 
 def reference_for(opt: Option) -> dict:
-    """Reference value WITH its own uncertainty band (never treated as exact)."""
+    """Reference uncertainty is separate from policy Monte Carlo uncertainty."""
     if opt.kind == "put":
-        fine, coarse = crr_bermudan_put(opt, 320), crr_bermudan_put(opt, 160)
-        err = abs(fine - coarse)
+        fine = crr_bermudan_put(opt, 2560)
+        convolution = convolution_bermudan_put(opt)
+        coarse = convolution_bermudan_put(opt, 0.001)
+        err = abs(fine - convolution) + abs(convolution - coarse)
         return dict(value=fine, low=fine - err, high=fine + err,
-                    source="CRR tree, 320 steps per exercise interval (band = refinement difference)")
-    if opt != paper_max_call(opt.d) or opt.d not in PAPER_REFERENCES:
-        raise ValueError("Published references only apply to the exact Table 1 parameters.")
+                    convolution=convolution, grid_band=err,
+                    source="CRR 2560 steps/date; heuristic grid band = CRR/convolution discrepancy + convolution refinement; not certified")
+    if opt != paper_max_call(opt.d) or opt.d not in PAPER_REFERENCES or opt.d == 10:
+        raise ValueError("Verified-scope references require exact Table 1 2D/5D parameters.")
     return dict(PAPER_REFERENCES[opt.d])
 
 
@@ -716,11 +758,47 @@ def run_unit(opt: Option, n_train: int, seed: int, variants, settings: NeuralSet
 # =============================================================================
 # 7. Results storage: one line per unit, resumable, frozen configuration
 # =============================================================================
+def stable_hash(value) -> str:
+    return hashlib.sha256(json.dumps(value, sort_keys=True, default=str).encode()).hexdigest()[:16]
+
+
 def code_hash() -> str:
-    """Hash of this file, stored with a full run so results from different code versions
-    can never be mixed. (Any edit to stopping.py, even a comment, changes it.)"""
-    import hashlib
-    return hashlib.sha256(Path(__file__).read_bytes()).hexdigest()[:16]
+    """Hash all project Python modules and notebook code cells, not prose/outputs.
+
+    Includes filenames; excludes tests, caches and temporary notebook copies.
+    """
+    digest = hashlib.sha256()
+    for path in sorted(PROJECT_ROOT.glob("*.py")):
+        digest.update(path.name.encode())
+        digest.update(path.read_bytes())
+    for path in sorted(PROJECT_ROOT.glob("[0-9][0-9]_*.ipynb")):
+        notebook = json.loads(path.read_text())
+        digest.update(path.name.encode())
+        digest.update(json.dumps([c["source"] for c in notebook["cells"] if c["cell_type"] == "code"], sort_keys=True).encode())
+    return digest.hexdigest()[:16]
+
+
+def calibration_provenance(mode: str) -> dict:
+    from importlib.metadata import version
+    import platform
+    return dict(code_hash=code_hash(), config_hash=stable_hash(CONFIG), mode=mode,
+                environment=dict(python=platform.python_version(), packages={p: version(p) for p in
+                    ("numpy", "scipy", "pandas", "matplotlib", "torch", "threadpoolctl", "ipykernel")}))
+
+
+def calibration_path(out: Path, mode: str) -> Path:
+    """Resume only matching provenance; keep unversioned/old evidence untouched."""
+    provenance = calibration_provenance(mode)
+    path = Path(out) / f"calibration-{stable_hash(provenance)}.csv"
+    meta = path.with_suffix(".json")
+    if meta.exists():
+        if json.loads(meta.read_text()) != provenance:
+            raise RuntimeError("Calibration provenance mismatch")
+    elif path.exists():
+        raise RuntimeError("Calibration CSV has no provenance; refusing resume")
+    else:
+        meta.write_text(json.dumps(provenance, indent=2))
+    return path
 
 
 def _jsonable(o):
@@ -751,7 +829,10 @@ class ResultStore:
                     raise RuntimeError(
                         f"{info_path} was written with a different frozen configuration or code version. "
                         "Restore the original configuration/code, or move the folder away to start a new study.")
-                self.path.unlink(missing_ok=True)      # quick mode: just start over
+                # Preserve old quick evidence; deterministic sibling for this config.
+                namespace = self.folder.with_name(self.folder.name + "-" + stable_hash(run_info["frozen"]))
+                self.__init__(namespace, run_info, mode)
+                return
         info_path.write_text(json.dumps(run_info, indent=2, default=str))
 
     def units(self) -> list:
