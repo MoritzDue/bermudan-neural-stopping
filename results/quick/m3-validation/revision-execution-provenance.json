@@ -1,0 +1,27 @@
+{
+  "execution_dual_sha256_reconstructed": "12c92975e6885a6b4719783f2495a91ddeea836c952d1ab487793e27d26363b6",
+  "reconstruction_note": "Reversed recorded later changes to memory-cap validation, metadata and docstring; numerical algorithm unchanged. Not a hash captured before execution.",
+  "stopping_sha256": "3e534ba125013a8a0d7b090051a9e7668274820e8d69f32a33b3eeb9f8093185",
+  "training_5d": {
+    "base_seed": 2026,
+    "role_extra": 910,
+    "paths": 10000,
+    "validation_paths": 5000,
+    "train_seed": 2041750001,
+    "val_seed": 963510049,
+    "init_seed": 1091092672,
+    "neural_settings": {
+      "sorted_inputs": true,
+      "payoff_input": true,
+      "max_steps": 1500,
+      "lr": 0.001,
+      "batch": 256,
+      "width_extra": 40,
+      "batch_norm": true,
+      "eval_every": 0,
+      "fresh_paths": false
+    }
+  },
+  "preservation": "Four pre-existing modified quick files were never written by this task. Earlier M3 evidence is retained.",
+  "experiments": "M3 bounded validation only; no notebooks or full-study results executed."
+}

@@ -1,0 +1,32 @@
+{
+  "budgets": [
+    800,
+    1600,
+    3200,
+    6400,
+    12800
+  ],
+  "outer": 2000,
+  "group": 800,
+  "pilot_outer": 20,
+  "pilot_seed": 96300,
+  "evaluation_seed": 96301,
+  "policy_seed": 910,
+  "target_outer_ci_halfwidth": 0.03,
+  "rule": "smallest common candidate: absolute adjacent drop < doubling outer SE AND absolute cumulative drop < largest outer SE; candidate must have evaluated doubling; both policies must meet precision",
+  "precision_rule": "1.96 times marginal upper SE <= .03 for both policies",
+  "ceiling_seconds": 7200,
+  "preflight_margin": 1.5,
+  "neural": {
+    "sorted_inputs": true,
+    "payoff_input": true,
+    "max_steps": 1500,
+    "lr": 0.001,
+    "batch": 256,
+    "width_extra": 40,
+    "batch_norm": true,
+    "eval_every": 0,
+    "fresh_paths": false
+  },
+  "limitations": "Largest prefix is not an oracle. No extrapolation. Fresh evaluation seed after adaptation. Quick validation only."
+}

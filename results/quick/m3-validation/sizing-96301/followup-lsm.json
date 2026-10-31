@@ -1,0 +1,147 @@
+{
+  "rows": [
+    {
+      "inner": 800,
+      "upper": {
+        "mean": 26.210172886940885,
+        "se": 0.017205802237404613,
+        "ci_low": 26.17644951455557,
+        "ci_high": 26.2438962593262
+      },
+      "value_gap": null,
+      "metadata": {
+        "inner": 800,
+        "outer": 2000,
+        "blocks": 4
+      },
+      "cumulative_drop": {
+        "mean": 0.05179103954983807,
+        "se": 0.01597256116134138,
+        "ci_low": 0.02048481967360896,
+        "ci_high": 0.08309725942606717
+      },
+      "cumulative_gate": false,
+      "eligible": false,
+      "adjacent_drop": {
+        "mean": 0.03862106374399198,
+        "se": 0.011695983314874071,
+        "ci_low": 0.015696936446838804,
+        "ci_high": 0.06154519104114516
+      },
+      "adjacent_gate": false
+    },
+    {
+      "inner": 1600,
+      "upper": {
+        "mean": 26.171551823196893,
+        "se": 0.012584918449147818,
+        "ci_low": 26.14688538303656,
+        "ci_high": 26.196218263357224
+      },
+      "value_gap": null,
+      "metadata": {
+        "inner": 1600,
+        "outer": 2000,
+        "blocks": 4
+      },
+      "cumulative_drop": {
+        "mean": 0.013169975805846099,
+        "se": 0.010852055078063593,
+        "ci_low": -0.008100052147158542,
+        "ci_high": 0.03444000375885074
+      },
+      "cumulative_gate": false,
+      "eligible": false,
+      "adjacent_drop": {
+        "mean": 0.009983907040249498,
+        "se": 0.008110770830622813,
+        "ci_low": -0.005913203787771215,
+        "ci_high": 0.025881017868270212
+      },
+      "adjacent_gate": false
+    },
+    {
+      "inner": 3200,
+      "upper": {
+        "mean": 26.161567916156645,
+        "se": 0.009695197690816363,
+        "ci_low": 26.142565328682647,
+        "ci_high": 26.180570503630644
+      },
+      "value_gap": null,
+      "metadata": {
+        "inner": 3200,
+        "outer": 2000,
+        "blocks": 4
+      },
+      "cumulative_drop": {
+        "mean": 0.0031860687655966,
+        "se": 0.007115750203817344,
+        "ci_low": -0.010760801633885392,
+        "ci_high": 0.017132939165078593
+      },
+      "cumulative_gate": true,
+      "eligible": true,
+      "adjacent_drop": {
+        "mean": 0.002012142702641173,
+        "se": 0.0058926527059433,
+        "ci_low": -0.009537456601007696,
+        "ci_high": 0.013561742006290041
+      },
+      "adjacent_gate": true
+    },
+    {
+      "inner": 6400,
+      "upper": {
+        "mean": 26.159555773454002,
+        "se": 0.007868455343160538,
+        "ci_low": 26.14413360098141,
+        "ci_high": 26.174977945926596
+      },
+      "value_gap": null,
+      "metadata": {
+        "inner": 6400,
+        "outer": 2000,
+        "blocks": 4
+      },
+      "cumulative_drop": {
+        "mean": 0.0011739260629554274,
+        "se": 0.004161761717138805,
+        "ci_low": -0.00698312690263663,
+        "ci_high": 0.009330979028547485
+      },
+      "cumulative_gate": true,
+      "eligible": true,
+      "adjacent_drop": {
+        "mean": 0.0011739260629554274,
+        "se": 0.004161761717138805,
+        "ci_low": -0.00698312690263663,
+        "ci_high": 0.009330979028547485
+      },
+      "adjacent_gate": true
+    },
+    {
+      "inner": 12800,
+      "upper": {
+        "mean": 26.158381847391045,
+        "se": 0.0066958325379912935,
+        "ci_low": 26.14525801561658,
+        "ci_high": 26.17150567916551
+      },
+      "value_gap": null,
+      "metadata": {
+        "inner": 12800,
+        "outer": 2000,
+        "blocks": 4
+      },
+      "cumulative_drop": {
+        "mean": 0.0,
+        "se": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0
+      },
+      "cumulative_gate": true,
+      "eligible": false
+    }
+  ]
+}

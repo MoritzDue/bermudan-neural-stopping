@@ -1,0 +1,10 @@
+{
+  "policy": "lsm",
+  "block": 3,
+  "seed": 4287500772,
+  "error": "TimeoutError",
+  "signal": [],
+  "seconds": 12.294360439999764,
+  "blocks_remaining": 5,
+  "status": "incomplete"
+}

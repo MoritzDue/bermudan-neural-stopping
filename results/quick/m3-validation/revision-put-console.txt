@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/home/morit/quantlab/projects/bermudan-optimal-stopping/.m3_put.py", line 6, in <module>
+    from dual_validation import crr_boundary_policy,independent_gap
+  File "/home/morit/quantlab/projects/bermudan-optimal-stopping/dual_validation.py", line 276
+    from stopping import *
+                         ^
+SyntaxError: import * only allowed at module level

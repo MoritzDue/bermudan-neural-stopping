@@ -1,0 +1,136 @@
+{
+  "status": "M3 incomplete; neural sizing interrupted, independent review required",
+  "source_sha256": {
+    "dual.py": "70eb57437909f6f04cb01370ad505918bdffbed34fc40788da0526bbca808b1f",
+    "dual_validation.py": "5ad3ed24339bf8e93e9f4a7be37de7027375659a0dae0b6432b8aa40e517b0cd",
+    "tests/test_dual_validation.py": "432ef1fb63536b7c95a40be1a8251fe62502e11583c28fbe4cf05ece030b2e62",
+    "stopping.py": "3e534ba125013a8a0d7b090051a9e7668274820e8d69f32a33b3eeb9f8093185"
+  },
+  "confirmation": {
+    "family_size": 246,
+    "normal_threshold": 4.103751516862526,
+    "normal_failures": 0,
+    "bounded_failures": 0,
+    "largest_abs_z_without_grid_allowance": 2.6258900257951763,
+    "seeds": [
+      95121,
+      95122
+    ],
+    "raw_tail_failures_retained": 6,
+    "limitations": "Normal diagnostics asymptotic. Bounded test has low power. Grid refinement is sensitivity, not certified error. No 5D conditional oracle."
+  },
+  "coverage": {
+    "repetitions": 50,
+    "violations": 0,
+    "rate": 0.0,
+    "binomial_ci": [
+      0.0,
+      0.07112173646419764
+    ],
+    "note": "Coverage of finite-inner U against CRR; upward bias makes this conservative."
+  },
+  "retained_adversarial": [
+    {
+      "policy": "never",
+      "inner": 200,
+      "upper": {
+        "mean": 58.83792244684611,
+        "se": 0.10650335089721541,
+        "ci_low": 58.62917587908756,
+        "ci_high": 59.04666901460465
+      },
+      "exact": 58.80711789683454,
+      "passes_3se": true
+    },
+    {
+      "policy": "never",
+      "inner": 800,
+      "upper": {
+        "mean": 58.795000853960275,
+        "se": 0.05502725090091735,
+        "ci_low": 58.68714744219448,
+        "ci_high": 58.90285426572607
+      },
+      "exact": 58.80711789683454,
+      "passes_3se": true
+    },
+    {
+      "policy": "never",
+      "inner": 3200,
+      "upper": {
+        "mean": 58.802893132989894,
+        "se": 0.028422534285084407,
+        "ci_low": 58.74718496579113,
+        "ci_high": 58.85860130018866
+      },
+      "exact": 58.80711789683454,
+      "passes_3se": true
+    },
+    {
+      "policy": "lsm",
+      "inner": 200,
+      "upper": {
+        "mean": 58.83198813868875,
+        "se": 0.10893763468281495,
+        "ci_low": 58.618470374710434,
+        "ci_high": 59.04550590266707
+      },
+      "exact": 58.80711789683454,
+      "passes_3se": true
+    },
+    {
+      "policy": "lsm",
+      "inner": 800,
+      "upper": {
+        "mean": 58.787214023299356,
+        "se": 0.05938423302706335,
+        "ci_low": 58.670820926566314,
+        "ci_high": 58.9036071200324
+      },
+      "exact": 58.80711789683454,
+      "passes_3se": true
+    },
+    {
+      "policy": "lsm",
+      "inner": 3200,
+      "upper": {
+        "mean": 58.802659202521376,
+        "se": 0.03912090014144391,
+        "ci_low": 58.72598223824414,
+        "ci_high": 58.87933616679861
+      },
+      "exact": 58.80711789683454,
+      "passes_3se": true
+    }
+  ],
+  "put_selected_validation_inner": 6400,
+  "lsm_sizing_seconds": 773.4258506520018,
+  "main_study_budget": {
+    "inner": null,
+    "outer": null,
+    "reason": "No completed 5D neural sizing sweep; common-budget gate unresolved."
+  },
+  "interrupted": {
+    "exit_code": 130,
+    "completed_neural_sizing": false,
+    "reason": "Wall-clock inspection exceeded local two-hour sizing allowance. Original preflight timed only LSM, an invalid runtime proxy for neural inference. Exact CPU consumption unavailable."
+  },
+  "checks": {
+    "discovery": "25 tests passed in revision-unit-complete.txt; post-timeout-fix discovery recorded separately",
+    "compile": "dual.py, dual_validation.py and test module compiled successfully"
+  },
+  "criteria": {
+    "non_violation_and_boundary_gap": "supported by retained evidence and fresh put sweep; reviewer evaluation pending",
+    "coverage": "0/50; 95% binomial interval [0, 0.07112], not proof population rate <=5%",
+    "conditional_centering": "fresh predeclared evidence available; independent evaluation pending",
+    "inner_convergence": "UNRESOLVED for main-study sizes",
+    "no_dividend_adversarial": "retained executed evidence passes"
+  },
+  "limitations": [
+    "No full-study findings or notebook execution.",
+    "Primary-paper verification still unavailable offline.",
+    "Policy-specific repaired preflight not executed; new wall-time guard tested.",
+    "Interrupted neural samples were not persisted and are not treated as complete.",
+    "Prior failed diagnostics and four pre-existing human quick-file edits preserved."
+  ]
+}

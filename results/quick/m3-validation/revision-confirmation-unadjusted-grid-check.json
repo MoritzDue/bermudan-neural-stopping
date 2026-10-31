@@ -1,0 +1,41 @@
+{
+  "rows": [
+    {
+      "seed": 95121,
+      "policy": "crr_boundary",
+      "max_abs_z_without_grid_allowance": 2.261795664658457,
+      "normal_failures_without_grid_allowance": 0
+    },
+    {
+      "seed": 95121,
+      "policy": "lsm",
+      "max_abs_z_without_grid_allowance": 2.2513282010711917,
+      "normal_failures_without_grid_allowance": 0
+    },
+    {
+      "seed": 95121,
+      "policy": "never",
+      "max_abs_z_without_grid_allowance": 2.6258900257951763,
+      "normal_failures_without_grid_allowance": 0
+    },
+    {
+      "seed": 95122,
+      "policy": "crr_boundary",
+      "max_abs_z_without_grid_allowance": 2.5182503645263115,
+      "normal_failures_without_grid_allowance": 0
+    },
+    {
+      "seed": 95122,
+      "policy": "lsm",
+      "max_abs_z_without_grid_allowance": 2.2764050625013286,
+      "normal_failures_without_grid_allowance": 0
+    },
+    {
+      "seed": 95122,
+      "policy": "never",
+      "max_abs_z_without_grid_allowance": 2.0931262672818707,
+      "normal_failures_without_grid_allowance": 0
+    }
+  ],
+  "note": "Bonferroni normal diagnostic without any grid allowance; no sparse omissions."
+}

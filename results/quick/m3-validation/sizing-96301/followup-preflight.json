@@ -1,0 +1,11 @@
+{
+  "policy_seconds": {
+    "lsm": 1.4746374979999928,
+    "neural": 1.3911048350000783
+  },
+  "projected_sweep_seconds": 3438.8907996000853,
+  "remaining_seconds": 7170.1145819289995,
+  "passed": true,
+  "concurrent_experiments": false,
+  "setup_and_preflight_seconds": 29.885420596000017
+}

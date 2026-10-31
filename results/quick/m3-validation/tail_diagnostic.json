@@ -1,0 +1,22 @@
+{
+  "n": 600,
+  "spot_range": [
+    120.24189456094463,
+    221.5243846983155
+  ],
+  "terminal_positive": 0,
+  "exact_C8_mean": 0.0005907462947513802,
+  "exact_increment": {
+    "mean": -0.0005907462947513802,
+    "se": 4.4201345604464784e-05,
+    "ci_low": -0.0006773809321361311,
+    "ci_high": -0.0005041116573666292
+  },
+  "inner_C8_error": {
+    "mean": -5.379341705743027e-06,
+    "se": 1.0418168888096397e-05,
+    "ci_low": -2.5798952726411966e-05,
+    "ci_high": 1.5040269314925912e-05
+  },
+  "interpretation": "Analytic maturity continuation substituted for inner estimate. Tail has zero realized positive terminal payoffs; a normal 3-SE statistic is unreliable for this rare-event bin. Do not treat this as a passed conditional-drift gate."
+}

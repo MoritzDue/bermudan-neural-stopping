@@ -23,6 +23,7 @@ Policies must be fixed deterministic state rules, trained independently
 of these paths. No inner estimate is used to decide exercise. Primary
 paper verification is pending offline source access.
 """
+import time
 import numpy as np
 from stopping import gbm_paths, exercise_mask, discounted_payoffs, seed_for
 
@@ -100,3 +101,63 @@ def policy_dual(opt, policy, *, outer=1000, inner=200, base_seed=2026,
                               estimated_chunk_bytes=chunk*bytes_per_outer, outer_seed=osd,
                               inner_seed=isd, base_seed=base_seed, seed=seed, guarded=guarded,
                               ci='95% asymptotic normal; conditional on fixed policy; inner bias retained'))
+
+
+def nested_policy_dual(opt, policy, *, budgets, outer=2000, seed=912,
+                       group=200, memory_mb=256, guarded=True, max_seconds=None):
+    """Common inner samples: each budget averages a prefix of IID groups.
+
+    Each (outer index, date, group) has a distinct SeedSequence. Outer randomness
+    uses a separate role. No future outer states enter the inner simulation.
+    Processing one outer state bounds memory independently of the largest budget.
+    Increasing budgets leaves every earlier sample bitwise unchanged.
+    Seed roles use the registered base 2026. value_gap estimates U-C_hat_0:
+    its expectation is the same policy gap, often with much less outer noise
+    than U-Z_tau. It retains inner bias and is not a pathwise bound.
+    """
+    started = time.perf_counter()
+    if max_seconds is not None and (not np.isfinite(max_seconds) or max_seconds <= 0):
+        raise ValueError("max_seconds must be positive")
+    budgets = tuple(budgets)
+    if (not budgets or outer < 2 or group < 1 or
+        any(not isinstance(n, int) or n < group or n % group for n in budgets) or
+        tuple(sorted(set(budgets))) != budgets):
+        raise ValueError('sorted distinct budgets must be positive multiples of group')
+    estimated_bytes = (8*16*group*(opt.d+1) +
+                       8*outer*(opt.dates+1)*(opt.d+len(budgets)+5))
+    if not np.isfinite(memory_mb) or memory_mb <= 0 or estimated_bytes > memory_mb*1024**2:
+        raise ValueError('working arrays exceed memory cap')
+    osd = seed_for(2026, 'dual_outer', opt.d, seed)
+    isd = seed_for(2026, 'dual_inner', opt.d, seed)
+    if osd == isd:
+        raise ValueError('seed collision')
+    paths = gbm_paths(opt, outer, seed=osd)
+    z = opt.payoff(paths)*opt.discount(np.arange(opt.dates+1))
+    lower = discounted_payoffs(opt, paths, policy, guarded)[0]
+    c = np.empty((len(budgets), outer, opt.dates))
+    for a in range(outer):
+        if max_seconds is not None and time.perf_counter()-started >= max_seconds:
+            raise TimeoutError("nested dual exceeded wall-time allowance; incomplete run")
+        for k in range(opt.dates):
+            total = 0.
+            for g in range(budgets[-1]//group):
+                rng = np.random.default_rng(np.random.SeedSequence([isd,a,k,g]))
+                total += continuation(opt, paths[a:a+1,k], k, policy, group, rng, guarded)[0]
+                n = (g+1)*group
+                if n in budgets:
+                    c[budgets.index(n),a,k] = total/(g+1)
+    results = []
+    for i,n in enumerate(budgets):
+        mart = np.zeros((outer,opt.dates+1))
+        for k in range(1,opt.dates+1):
+            lk = z[:,k] if k == opt.dates else np.where(
+                exercise_mask(opt,policy,k,paths[:,k],guarded),z[:,k],c[i,:,k])
+            mart[:,k] = mart[:,k-1]+lk-c[i,:,k-1]
+        u = np.max(z[:,1:]-mart[:,1:],axis=1)
+        results.append(dict(upper=_summary(u), upper_samples=u,
+            lower=_summary(lower), gap=_summary(u-lower),
+            value_gap=_summary(u-c[i,:,0]), martingale_samples=mart,
+            metadata=dict(outer=outer,inner=n,outer_seed=osd,inner_seed=isd,
+                          seed=seed,group=group,estimated_working_bytes=estimated_bytes,
+                          coupling='IID group prefix')))
+    return results

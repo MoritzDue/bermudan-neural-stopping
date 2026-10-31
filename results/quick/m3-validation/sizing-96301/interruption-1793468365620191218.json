@@ -1,0 +1,10 @@
+{
+  "policy": "neural",
+  "block": 3,
+  "seed": 2740741632,
+  "error": "TimeoutError",
+  "signal": [],
+  "seconds": 75.15736717500022,
+  "blocks_remaining": 1,
+  "status": "incomplete"
+}
