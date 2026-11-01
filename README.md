@@ -2,10 +2,10 @@
 
 **Question.** For a 5-asset Bermudan max-call, does a neural stopping policy (Becker, Cheridito & Jentzen, 2019) beat classical Longstaff–Schwartz regression (LSM)? And how close to optimal is either policy?
 
-**Answer.**
+**Findings (conditional on the stated implementations and evaluation design).**
 - With plenty of data (50k training paths), neural stopping and LSM are **statistically indistinguishable**: the difference is +0.004, with 95% CI [−0.035, +0.043].
 - With little data (1k paths), **LSM is ahead in 9 of 10 seeds** (−0.123), but the pre-registered t-test is borderline (p = 0.053).
-- Andersen–Broadie upper bounds show that **both policies are within about 0.05 of the optimal value** (≈ 0.2% of a price of 26.1). Both bounds fall inside the published reference interval.
+- The nested primal–dual estimates imply **estimated gaps of 0.059 (LSM) and 0.046 (neural)** for the seed-zero 50k policies, around 0.2% of an option value near 26.1. These are estimates with outer Monte Carlo error and potentially positive finite-inner bias, not deterministic certificates that the true policy gaps are below 0.05. The estimated upper-bound means lie within the published reference interval.
 
 ![Neural minus LSM by training budget](results/headline/fig_neural_minus_lsm.png)
 ![Primal–dual bounds](results/headline/fig_primal_dual_bounds.png)
@@ -35,7 +35,7 @@ Reference: Becker et al. (2019) report a 95% interval of [26.138, 26.174] for th
   - Neural: a network per exercise date, trained directly on the stopping payoff, with sorted inputs and a payoff feature.
 
   Both are evaluated as stopping rules on the same test paths, so every price is a **lower bound**.
-- **Upper bounds.** The Andersen–Broadie (2004) primal–dual method builds a martingale from nested inner simulations (2,000 outer × 3,200 inner paths). Its expected value bounds the true price from above, and the gap measures how much value a policy leaves on the table.
+- **Upper bounds.** The Andersen–Broadie (2004) primal–dual method builds a martingale from nested inner simulations (2,000 outer × 3,200 inner paths). The finite-inner estimator is an upper bound **in expectation**, not on every realised simulation; its upward inner-simulation bias remains. The estimated gap gives a statistical measure of policy suboptimality, not a pathwise guarantee.
 - **Statistics.** Neural and LSM are compared seed by seed (paired), with Student-t intervals across seeds. Upper and lower bounds are paired on the same outer paths, which makes the gap far more precise than either bound alone. A doubled inner budget (6,400) checked the bounds' stability.
 - **Pre-registration.** Hypotheses, thresholds and the full run list were frozen in a manifest before any full result existed, sized from measured timings.
 - **Validation.**
@@ -56,6 +56,14 @@ Reference: Becker et al. (2019) report a 95% interval of [26.138, 26.174] for th
 
   The neural settings were fixed, not optimised.
 - Results hold for these implementations, budgets and one machine.
+
+## Reproducibility and interpretation
+
+The committed notebooks run in **quick mode only**. The research results in `results/headline/` come from the frozen historical `study-v1` pipeline; do not treat fresh quick-mode notebook outputs as an independent reproduction of those results. The historical tag contains the frozen plan, aggregation tools and checkpoint provenance notes. In particular, its README disclosed an execution-hash mismatch and noted that the strict runner could not directly regenerate all summaries, although an independent archival procedure did verify byte-identical regeneration from checked checkpoints. This is an **archival provenance limitation**, not evidence of a pricing error. Reproducing plots from committed CSVs verifies presentation, not the full experiment.
+
+Statistical comparisons across ten fitting seeds are **conditional on one shared test set**; training-seed replication does not remove shared-test sampling error. The 50k ±0.05 equivalence claim is therefore inconclusive after accounting for this additional uncertainty. The 1k comparison has a borderline prespecified t-test, so the 9/10 sign pattern should not be represented as decisive under that test. Duality-gap confidence intervals capture outer Monte Carlo uncertainty, not the finite-inner bias.
+
+**Scope:** the completed full study did not include the proposed 2D comparison, four-network ablation, neural tuning grid, or development-cost analysis. Those are design ideas and quick-mode diagnostics, not completed headline findings.
 
 ## Repository
 
@@ -80,7 +88,7 @@ python -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python make_figures.py             # redraw the figures from saved results
 ```
 
-The notebooks run in quick mode, a few minutes of smoke tests whose numbers are not results. The full study took about 45 minutes of single-thread compute. Its exact code, frozen manifest and the script that regenerates every summary byte-for-byte are at git tag **`study-v1`**.
+The notebooks run in quick mode, a few minutes of smoke tests whose numbers are not results. The full study took about 45 minutes of single-thread compute. The historical code, frozen manifest, and archival regeneration utilities are at git tag **`study-v1`**; read that tag's provenance notes before interpreting the byte-for-byte archival reproduction claim.
 
 ## References
 
