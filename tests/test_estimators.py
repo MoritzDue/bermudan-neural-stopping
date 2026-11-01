@@ -12,7 +12,7 @@ from stopping import (Option, Policy, CONFIG, NeuralSettings, asdict,
                       gbm_paths, discounted_payoffs, load_study_settings)
 
 
-class M4EstimatorTests(unittest.TestCase):
+class EstimatorTests(unittest.TestCase):
     def test_initial_value_identity_and_independent_policy_mean(self):
         opt = Option(kind='put', d=1, dates=3)
         policy = Policy('never')

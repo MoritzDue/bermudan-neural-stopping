@@ -1,1 +1,0 @@
-{"seed":95202,"outer":3000,"group":800,"budgets":[800,1600,3200,6400,12800],"policy":"crr_boundary","independent_primal_seed":71003,"independent_primal_paths":500000,"gate":"absolute paired doubling change < current outer SE","preflight_outer":20,"preflight_seed":95203,"ceiling_seconds":1800,"status":"registered before execution"}

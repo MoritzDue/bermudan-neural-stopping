@@ -1,9 +1,0 @@
-{
-  "status": "candidate awaiting independent review",
-  "blocks_remaining": 0,
-  "main_study_budget": {
-    "inner": 3200,
-    "outer": 2000
-  },
-  "residual_bias": "Unmeasured beyond largest evaluated prefix; no zero-bias claim."
-}

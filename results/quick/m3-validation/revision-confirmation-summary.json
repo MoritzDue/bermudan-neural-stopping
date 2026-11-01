@@ -1,7 +1,0 @@
-{
-  "family_size": 246,
-  "threshold": 4.103751516862526,
-  "bounded_failures": 0,
-  "normal_failures": 0,
-  "limitation": "Bounded test is rigorous for exact continuation but extremely low power; grid sensitivity is not a certified error bound. Normal diagnostics are not treated as proof."
-}
