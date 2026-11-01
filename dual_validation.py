@@ -1,4 +1,4 @@
-"""Bounded M3 validation experiments; smoke evidence, not the full study.
+"""Bounded validation experiments for the dual estimator; smoke evidence, not the full study.
 
 Run with the project interpreter. Output is JSON on stdout; no cached evidence
 is overwritten. Main-study sizes remain unset unless all budget gates pass.
@@ -74,7 +74,7 @@ def run_validation():
     boundary,bounds,tree=crr_boundary_policy(o)
     lsm,_=select_lsm(o,gbm_paths(o,10000,seed=71001),gbm_paths(o,5000,seed=71002))
     immediate=Policy('immediate',rules={k:lambda x:np.ones(len(x),bool) for k in range(1,o.dates)})
-    report=dict(kind='M3 bounded validation, not full research results',source_hash=code_hash(),
+    report=dict(kind='bounded dual validation, not full research results',source_hash=code_hash(),
                 environment=calibration_provenance('quick')['environment'],reference=ref,
                 crr_value=tree,boundaries=bounds,policies={},sweep=[],coverage={})
     primal_paths=gbm_paths(o,500000,seed=71003)
@@ -117,7 +117,7 @@ def run_validation():
     last,penultimate=report['sweep'][-1],report['sweep'][-2]
     stable=abs(last['upper']['mean']-penultimate['upper']['mean'])<last['upper']['se']
     report['budget_selection']=dict(selected=None,inner_1600_to_3200_stable=bool(stable),
-        reason='No 5D production sizes frozen from small smoke cases. Requires independent review and M5 measured preflight; no acceptance gate relaxed.')
+        reason='No 5D production sizes frozen from small smoke cases. Requires independent review and a measured timing preflight; no acceptance gate relaxed.')
     report['peak_rss_mb']=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss/1024
     report['elapsed_seconds']=time.perf_counter()-start
     return report
@@ -145,7 +145,7 @@ def terminal_drift_decomposition(opt, result, bins=5):
     Expected positive-payoff counts use exact conditional probabilities, never
     realised counts. Cells below 30 are non-testable by the normal total-drift
     diagnostic. Earlier dates still require the independent grid-based check.
-    This is a proposed replacement gate, requiring controller recording/review.
+    This is a proposed replacement gate that requires independent review.
     """
     from scipy.stats import norm
     if opt.d != 1 or opt.kind != 'put' or opt.sigma <= 0:
@@ -174,7 +174,7 @@ def terminal_drift_decomposition(opt, result, bins=5):
 
 
 def run_correction(outer=2000):
-    """M3 pass-one 5D sizing diagnostic; every run is smoke evidence only.
+    """First-pass 5D dual sizing diagnostic; every run is smoke evidence only.
 
     Run separately from the old evidence-producing function. Emit rows as they
     finish to retain partial evidence on interruption. No study CONFIG is changed.
@@ -193,7 +193,7 @@ def run_correction(outer=2000):
     lsm, _ = select_lsm(opt, train, val)
     settings = NeuralSettings(max_steps=1500, lr=.001, batch=256)
     neural = fit_neural(opt, train, val, settings, seed=seed('init',5,910))
-    report = dict(kind='M3 correction smoke evidence; not full-study findings', outer=outer,
+    report = dict(kind='dual sizing smoke evidence; not full-study findings', outer=outer,
                   source_sha256={p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
                                  for p in ('stopping.py','dual.py','dual_validation.py')},
                   seed_protocol='base 2026; train/val/init extra 910; dual seed 911',
@@ -268,7 +268,7 @@ def grid_inner_error(opt, policy, result, h):
 
 
 def run_revision_confirmation():
-    """Execute registered M3 revision; exclusive output creation preserves evidence."""
+    """Run the registered dual-sizing revision; exclusive output creation preserves evidence."""
     import json, time, math
     from pathlib import Path
     import numpy as np
@@ -319,7 +319,7 @@ def run_revision_confirmation():
 
 
 def run_revision_sizing(preflight_only=False):
-    """Execute registered M3 revision; exclusive output creation preserves evidence."""
+    """Run the registered dual-sizing revision; exclusive output creation preserves evidence."""
     import json,time,math
     from pathlib import Path
     import numpy as np
@@ -386,7 +386,7 @@ def run_revision_sizing(preflight_only=False):
     selected=min(eligible) if eligible else None
     save('revision-sizing-selection.json',dict(selected_inner=selected,selected_outer=2000 if selected else None,
         gate='abs paired doubling change < current outer SE for both policies',
-        status='candidate requiring independent review and M5 preflight' if selected else 'unresolved',
+        status='candidate requiring independent review and a timing preflight' if selected else 'unresolved',
         no_bias_correction=True))
 
 

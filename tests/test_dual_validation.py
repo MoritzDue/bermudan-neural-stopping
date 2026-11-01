@@ -1,4 +1,4 @@
-"""Deterministic checks for M3 reference extraction and uncertainty accounting."""
+"""Deterministic checks for dual-validation reference extraction and uncertainty accounting."""
 import unittest
 import numpy as np
 from stopping import validation_put, crr_bermudan_put

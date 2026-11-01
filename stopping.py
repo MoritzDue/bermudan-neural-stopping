@@ -266,7 +266,7 @@ def convolution_bermudan_put(opt: Option, spacing: float = 0.0005) -> float:
     return float(v[n])
 
 
-# BCJ Table 1, transcribed from the Director brief; primary PDF unavailable offline.
+# BCJ (2019) Table 1, transcribed by hand; the primary PDF was not re-checked offline.
 # value/low/high remain compatibility aliases for the midpoint and DOS CI.
 PAPER_REFERENCES = {
     2: dict(value=13.899, lower=13.895, upper=13.903, midpoint=13.899,

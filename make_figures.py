@@ -9,7 +9,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 HERE = Path(__file__).resolve().parent
-DATA = HERE / "results/headline/m4-combined-freeze-rev5"
+DATA = HERE / "results/headline"
 OUT = HERE / "results/headline"
 
 SURFACE, INK, MUTED, GRID = "#fcfcfb", "#262624", "#6b6a64", "#e4e3dd"
