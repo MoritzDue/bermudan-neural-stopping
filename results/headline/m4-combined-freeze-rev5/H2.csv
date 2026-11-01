@@ -1,0 +1,4 @@
+d,budget,mean,se,ci_low,ci_high,half_width,n,shared_test_se_bound,shared_test_se_description,uncertainty,role
+5,1000,-0.12328450867488712,0.055236950123917675,-0.2482391710488347,0.001670153699060442,0.12495466237394756,10,0.020585660053398177,mean of per-seed paired SEs; not a combined SE,training-seed variation conditional on shared test set,primary
+5,10000,0.017205270767115508,0.030572139774533335,-0.05195371420591298,0.08636425574014399,0.06915898497302848,10,0.0160570010015136,mean of per-seed paired SEs; not a combined SE,training-seed variation conditional on shared test set,descriptive
+5,50000,0.003622450337541043,0.017200094760056902,-0.03528686722472955,0.04253176789981163,0.03890931756227059,10,0.01288645642756317,mean of per-seed paired SEs; not a combined SE,training-seed variation conditional on shared test set,primary
