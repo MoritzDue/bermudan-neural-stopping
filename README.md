@@ -88,4 +88,5 @@ The notebooks run in quick mode, a few minutes of smoke tests whose numbers are 
 - L. Andersen, M. Broadie (2004). *Primal-Dual Simulation Algorithm for Pricing Multidimensional American Options.* Management Science 50(9).
 - F. Longstaff, E. Schwartz (2001). *Valuing American Options by Simulation.* Review of Financial Studies 14(1).
 
-Implementation was done with AI coding agents (Claude and Codex). I defined the research question and scope, made the design and budget decisions, and reviewed the results at each step.
+I came up with an initial simplified version of this project based on the *Deep Optimal Stopping* paper. 
+Further implementation with extended scope was then done with AI coding agents (Claude and Codex). I defined the research question and scope, made the design and budget decisions, and reviewed the results at each step.
