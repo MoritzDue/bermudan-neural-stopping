@@ -1,0 +1,657 @@
+{
+  "provenance": {
+    "code_hash": "5373ab0d65274212",
+    "config_hash": "a2d26416fe8a3fac",
+    "mode": "quick",
+    "environment": {
+      "python": "3.14.4",
+      "packages": {
+        "numpy": "2.5.4",
+        "scipy": "1.18.1",
+        "pandas": "2.3.3",
+        "matplotlib": "3.11.2",
+        "torch": "2.15.0+cpu",
+        "threadpoolctl": "3.7.0",
+        "ipykernel": "7.4.0"
+      }
+    }
+  },
+  "components": [
+    {
+      "component": "setup",
+      "seconds": 0.6059669310016034,
+      "d": 5,
+      "budget": 1000
+    },
+    {
+      "component": "fit",
+      "seconds": 1.877360664999287,
+      "d": 5,
+      "budget": 1000,
+      "method": "lsm"
+    },
+    {
+      "component": "evaluation",
+      "seconds": 1.170554379999885,
+      "d": 5,
+      "budget": 1000,
+      "method": "lsm"
+    },
+    {
+      "component": "fit",
+      "seconds": 19.496297226000024,
+      "d": 5,
+      "budget": 1000,
+      "method": "sorted+payoff"
+    },
+    {
+      "component": "evaluation",
+      "seconds": 1.303187032999631,
+      "d": 5,
+      "budget": 1000,
+      "method": "sorted+payoff"
+    },
+    {
+      "component": "guard",
+      "seconds": 0.1493370150001283,
+      "method": "lsm"
+    },
+    {
+      "component": "guard",
+      "seconds": 0.17240710599980957,
+      "method": "nn"
+    },
+    {
+      "component": "fit",
+      "seconds": 20.24822784099888,
+      "d": 5,
+      "budget": 1000,
+      "method": "raw"
+    },
+    {
+      "component": "evaluation",
+      "seconds": 1.2196761499999411,
+      "d": 5,
+      "budget": 1000,
+      "method": "raw"
+    },
+    {
+      "component": "fit",
+      "seconds": 20.846949718999895,
+      "d": 5,
+      "budget": 1000,
+      "method": "raw+payoff"
+    },
+    {
+      "component": "evaluation",
+      "seconds": 1.2631376440003805,
+      "d": 5,
+      "budget": 1000,
+      "method": "raw+payoff"
+    },
+    {
+      "component": "fit",
+      "seconds": 18.43131526599973,
+      "d": 5,
+      "budget": 1000,
+      "method": "sorted"
+    },
+    {
+      "component": "evaluation",
+      "seconds": 1.0104582619987923,
+      "d": 5,
+      "budget": 1000,
+      "method": "sorted"
+    },
+    {
+      "component": "setup",
+      "seconds": 0.5762645070008148,
+      "d": 5,
+      "budget": 10000
+    },
+    {
+      "component": "fit",
+      "seconds": 4.753605978999985,
+      "d": 5,
+      "budget": 10000,
+      "method": "lsm"
+    },
+    {
+      "component": "evaluation",
+      "seconds": 4.302027273000931,
+      "d": 5,
+      "budget": 10000,
+      "method": "lsm"
+    },
+    {
+      "component": "fit",
+      "seconds": 21.952036050999595,
+      "d": 5,
+      "budget": 10000,
+      "method": "sorted+payoff"
+    },
+    {
+      "component": "evaluation",
+      "seconds": 1.415772325000944,
+      "d": 5,
+      "budget": 10000,
+      "method": "sorted+payoff"
+    },
+    {
+      "component": "setup",
+      "seconds": 0.7154626449992065,
+      "d": 5,
+      "budget": 50000
+    },
+    {
+      "component": "fit",
+      "seconds": 21.48639094200007,
+      "d": 5,
+      "budget": 50000,
+      "method": "lsm"
+    },
+    {
+      "component": "evaluation",
+      "seconds": 1.7215213569998014,
+      "d": 5,
+      "budget": 50000,
+      "method": "lsm"
+    },
+    {
+      "component": "fit",
+      "seconds": 19.34835665099854,
+      "d": 5,
+      "budget": 50000,
+      "method": "sorted+payoff"
+    },
+    {
+      "component": "evaluation",
+      "seconds": 1.2933061820003786,
+      "d": 5,
+      "budget": 50000,
+      "method": "sorted+payoff"
+    },
+    {
+      "component": "nested",
+      "seconds": 28.93783046899989,
+      "method": "lsm",
+      "coupled": false
+    },
+    {
+      "component": "serialization",
+      "seconds": 0.0021519769998121774,
+      "method": "lsm",
+      "coupled": false
+    },
+    {
+      "component": "nested",
+      "seconds": 57.12604958600059,
+      "method": "lsm",
+      "coupled": true
+    },
+    {
+      "component": "serialization",
+      "seconds": 0.0023633200016774936,
+      "method": "lsm",
+      "coupled": true
+    },
+    {
+      "component": "nested",
+      "seconds": 22.4550499270008,
+      "method": "sorted+payoff",
+      "coupled": false
+    },
+    {
+      "component": "serialization",
+      "seconds": 0.0007567640004708664,
+      "method": "sorted+payoff",
+      "coupled": false
+    },
+    {
+      "component": "nested",
+      "seconds": 44.987383718000274,
+      "method": "sorted+payoff",
+      "coupled": true
+    },
+    {
+      "component": "serialization",
+      "seconds": 0.001963610000530025,
+      "method": "sorted+payoff",
+      "coupled": true
+    },
+    {
+      "component": "fit",
+      "seconds": 18.66974166699947,
+      "d": 5,
+      "budget": 50000,
+      "method": "raw"
+    },
+    {
+      "component": "evaluation",
+      "seconds": 1.1335058669992577,
+      "d": 5,
+      "budget": 50000,
+      "method": "raw"
+    },
+    {
+      "component": "fit",
+      "seconds": 19.124838278001334,
+      "d": 5,
+      "budget": 50000,
+      "method": "raw+payoff"
+    },
+    {
+      "component": "evaluation",
+      "seconds": 1.2241643489996932,
+      "d": 5,
+      "budget": 50000,
+      "method": "raw+payoff"
+    },
+    {
+      "component": "fit",
+      "seconds": 18.746087753999745,
+      "d": 5,
+      "budget": 50000,
+      "method": "sorted"
+    },
+    {
+      "component": "evaluation",
+      "seconds": 1.0883852610004396,
+      "d": 5,
+      "budget": 50000,
+      "method": "sorted"
+    },
+    {
+      "component": "setup",
+      "seconds": 0.18823224500010838,
+      "d": 2,
+      "budget": 10000
+    },
+    {
+      "component": "fit",
+      "seconds": 1.051329630001419,
+      "d": 2,
+      "budget": 10000,
+      "method": "lsm"
+    },
+    {
+      "component": "evaluation",
+      "seconds": 0.6996309290007048,
+      "d": 2,
+      "budget": 10000,
+      "method": "lsm"
+    },
+    {
+      "component": "fit",
+      "seconds": 17.781181628000923,
+      "d": 2,
+      "budget": 10000,
+      "method": "sorted+payoff"
+    },
+    {
+      "component": "evaluation",
+      "seconds": 0.6774860990008165,
+      "d": 2,
+      "budget": 10000,
+      "method": "sorted+payoff"
+    }
+  ],
+  "guard": [
+    {
+      "method": "lsm",
+      "development_seed": 170,
+      "fresh_seed": 1205944263,
+      "rows": [
+        {
+          "date": 8,
+          "guarded": false,
+          "validation_gain": 0.8251087346187709,
+          "fresh_gain": 0.7150622467576051,
+          "fresh_se": 0.05611690139688469,
+          "fresh_ci_low": 0.6050731200197111,
+          "fresh_ci_high": 0.8250513734954991,
+          "fresh_stop_share": 0.3294,
+          "retained_fresh_gain": 0.7150622467576051
+        },
+        {
+          "date": 7,
+          "guarded": false,
+          "validation_gain": 0.7878520311779176,
+          "fresh_gain": 0.7556986804559761,
+          "fresh_se": 0.059352924172717765,
+          "fresh_ci_low": 0.6393669490774493,
+          "fresh_ci_high": 0.8720304118345029,
+          "fresh_stop_share": 0.2437,
+          "retained_fresh_gain": 0.7556986804559761
+        },
+        {
+          "date": 6,
+          "guarded": false,
+          "validation_gain": 0.7294856569994151,
+          "fresh_gain": 0.5658215250044953,
+          "fresh_se": 0.06265796389810362,
+          "fresh_ci_low": 0.4430119157642123,
+          "fresh_ci_high": 0.6886311342447784,
+          "fresh_stop_share": 0.28565,
+          "retained_fresh_gain": 0.5658215250044953
+        },
+        {
+          "date": 5,
+          "guarded": false,
+          "validation_gain": 0.4590141259684368,
+          "fresh_gain": 0.3718705349255166,
+          "fresh_se": 0.05420934393850695,
+          "fresh_ci_low": 0.265620220806043,
+          "fresh_ci_high": 0.4781208490449902,
+          "fresh_stop_share": 0.2001,
+          "retained_fresh_gain": 0.3718705349255166
+        },
+        {
+          "date": 4,
+          "guarded": false,
+          "validation_gain": 0.3856144911080763,
+          "fresh_gain": 0.29080540531251137,
+          "fresh_se": 0.046720166675063,
+          "fresh_ci_low": 0.1992338786293879,
+          "fresh_ci_high": 0.38237693199563483,
+          "fresh_stop_share": 0.14485,
+          "retained_fresh_gain": 0.29080540531251137
+        },
+        {
+          "date": 3,
+          "guarded": false,
+          "validation_gain": 0.18411320565135375,
+          "fresh_gain": 0.11798916630777542,
+          "fresh_se": 0.03779605152827448,
+          "fresh_ci_low": 0.043908905312357444,
+          "fresh_ci_high": 0.1920694273031934,
+          "fresh_stop_share": 0.0894,
+          "retained_fresh_gain": 0.11798916630777542
+        },
+        {
+          "date": 2,
+          "guarded": false,
+          "validation_gain": 0.01061374389526471,
+          "fresh_gain": -0.05336076303863645,
+          "fresh_se": 0.028782571579470072,
+          "fresh_ci_low": -0.10977460333439779,
+          "fresh_ci_high": 0.003053077257124892,
+          "fresh_stop_share": 0.0538,
+          "retained_fresh_gain": -0.05336076303863645
+        },
+        {
+          "date": 1,
+          "guarded": false,
+          "validation_gain": 0.019594280282598894,
+          "fresh_gain": -0.036684213111842064,
+          "fresh_se": 0.017947195507534233,
+          "fresh_ci_low": -0.07186071630660916,
+          "fresh_ci_high": -0.0015077099170749675,
+          "fresh_stop_share": 0.01905,
+          "retained_fresh_gain": -0.036684213111842064
+        }
+      ]
+    },
+    {
+      "method": "nn",
+      "development_seed": 170,
+      "fresh_seed": 1205944263,
+      "rows": [
+        {
+          "date": 8,
+          "guarded": false,
+          "validation_gain": 0.8042716793778605,
+          "fresh_gain": 0.6981789238871574,
+          "fresh_se": 0.06015774020720808,
+          "fresh_ci_low": 0.5802697530810296,
+          "fresh_ci_high": 0.8160880946932852,
+          "fresh_stop_share": 0.417,
+          "retained_fresh_gain": 0.6981789238871574
+        },
+        {
+          "date": 7,
+          "guarded": false,
+          "validation_gain": 0.8135650170573336,
+          "fresh_gain": 0.6493324900866195,
+          "fresh_se": 0.0566596617630136,
+          "fresh_ci_low": 0.5382795530311129,
+          "fresh_ci_high": 0.7603854271421262,
+          "fresh_stop_share": 0.2365,
+          "retained_fresh_gain": 0.6493324900866195
+        },
+        {
+          "date": 6,
+          "guarded": false,
+          "validation_gain": 0.737053994573672,
+          "fresh_gain": 0.4883656190086722,
+          "fresh_se": 0.06350345364064523,
+          "fresh_ci_low": 0.3638988498730076,
+          "fresh_ci_high": 0.6128323881443368,
+          "fresh_stop_share": 0.27085,
+          "retained_fresh_gain": 0.4883656190086722
+        },
+        {
+          "date": 5,
+          "guarded": false,
+          "validation_gain": 0.4748562829859786,
+          "fresh_gain": 0.47006744433475217,
+          "fresh_se": 0.057954158883458555,
+          "fresh_ci_low": 0.3564772929231734,
+          "fresh_ci_high": 0.5836575957463309,
+          "fresh_stop_share": 0.2302,
+          "retained_fresh_gain": 0.47006744433475217
+        },
+        {
+          "date": 4,
+          "guarded": false,
+          "validation_gain": 0.35238717335179204,
+          "fresh_gain": 0.19350019546884234,
+          "fresh_se": 0.044643177913404504,
+          "fresh_ci_low": 0.10599956675856952,
+          "fresh_ci_high": 0.28100082417911515,
+          "fresh_stop_share": 0.1364,
+          "retained_fresh_gain": 0.19350019546884234
+        },
+        {
+          "date": 3,
+          "guarded": false,
+          "validation_gain": 0.1851682784238751,
+          "fresh_gain": 0.07734141258633236,
+          "fresh_se": 0.03991543100161999,
+          "fresh_ci_low": -0.0008928321768428282,
+          "fresh_ci_high": 0.15557565734950754,
+          "fresh_stop_share": 0.09065,
+          "retained_fresh_gain": 0.07734141258633236
+        },
+        {
+          "date": 2,
+          "guarded": false,
+          "validation_gain": 0.012539237309302429,
+          "fresh_gain": 0.041612555742712644,
+          "fresh_se": 0.030049261909537467,
+          "fresh_ci_low": -0.01728399759998079,
+          "fresh_ci_high": 0.10050910908540608,
+          "fresh_stop_share": 0.0493,
+          "retained_fresh_gain": 0.041612555742712644
+        },
+        {
+          "date": 1,
+          "guarded": false,
+          "validation_gain": 0.020500046061795372,
+          "fresh_gain": 0.009787117157890452,
+          "fresh_se": 0.013864952391703149,
+          "fresh_ci_low": -0.01738818952984772,
+          "fresh_ci_high": 0.036962423845628624,
+          "fresh_stop_share": 0.0103,
+          "retained_fresh_gain": 0.009787117157890452
+        }
+      ]
+    }
+  ],
+  "snapshot_utc": "2026-11-01T18:11:12.030000+00:00",
+  "prior_post_snapshot_seconds": 0.0,
+  "resume_evidence": {
+    "path": "/tmp/work/results/quick/m4-combined-freeze-rev5/resume-pilot/resume_evidence.json",
+    "sha256": "989ff6bd8d973c08f2446cc6bdb0eb628d5913c89017cf17d863afeb7da039db",
+    "original_provenance": {
+      "code_hash": "5373ab0d65274212",
+      "config_hash": "a2d26416fe8a3fac",
+      "mode": "quick",
+      "environment": {
+        "python": "3.14.4",
+        "packages": {
+          "numpy": "2.5.4",
+          "scipy": "1.18.1",
+          "pandas": "2.3.3",
+          "matplotlib": "3.11.2",
+          "torch": "2.15.0+cpu",
+          "threadpoolctl": "3.7.0",
+          "ipykernel": "7.4.0"
+        }
+      }
+    },
+    "matches_frozen_code": true,
+    "limitation": "pilot rerun in this job at frozen code hash; no process termination during serialization"
+  },
+  "coupled_prefix_identical": true,
+  "ledger": {
+    "B": 12921.11,
+    "snapshot_timestamp": 1793556672.03,
+    "E_M4_remaining": 1065.1042941300002,
+    "Q": 198.18,
+    "R_M6": 318.18,
+    "levels": [
+      {
+        "level": 0,
+        "D": 4743.7645766387095,
+        "A": 8850.759398564904,
+        "R_corr": 474.37645766387095,
+        "fits": true
+      },
+      {
+        "level": 1,
+        "D": 5277.8750007107,
+        "A": 8808.030564639144,
+        "R_corr": 527.78750007107,
+        "fits": true
+      },
+      {
+        "level": 2,
+        "D": 5793.871474330726,
+        "A": 8766.75084674954,
+        "R_corr": 579.3871474330726,
+        "fits": true
+      },
+      {
+        "level": 3,
+        "D": 8982.730580146692,
+        "A": 8511.642118284266,
+        "R_corr": 898.2730580146692,
+        "fits": false
+      },
+      {
+        "level": 4,
+        "D": 9347.50490651874,
+        "A": 8482.460172174502,
+        "R_corr": 934.750490651874,
+        "fits": false
+      },
+      {
+        "level": 5,
+        "D": 40848.410880502,
+        "A": 5962.387694255841,
+        "R_corr": 4084.8410880502,
+        "fits": false
+      }
+    ],
+    "selected_level": 2,
+    "escalate": false
+  },
+  "elapsed_s": 765.1042941300002,
+  "oversized_units": [],
+  "supersedes": {
+    "namespace": "m4-combined-freeze-rev4-final2",
+    "reason": "P1 omitted full convergence and paper-check costs; exact shared section sizing and authorized full scope reduction before any full outcome; resume pilot rerun at current hash"
+  },
+  "conservative_extra_m4_seconds": 300.0,
+  "budget_accounting": "E_M4,rem includes prior expenditure + current elapsed + an extra conservative 300 s; this addition is separate from, and not charged again as, R_corr in the ledger",
+  "projection_assumptions": [
+    "1.2 safety on all measured components; 10 seconds extra restart/serialization overhead per unit",
+    "dual chunks repeat fitting and use maximum measured 5D nested and serialization time for every policy",
+    "P1 measures exact shared full section functions and assertions; each section includes measured fresh-process import plus 10 s restart overhead",
+    "timings use development seed 170; runtime variability remains"
+  ],
+  "validation_timings": {
+    "kind": "exact retained P1 path timing; NOT research evidence",
+    "components": [
+      {
+        "component": "checks",
+        "seconds": 1.1399646459994983
+      },
+      {
+        "component": "put",
+        "seconds": 57.97615343799953
+      },
+      {
+        "component": "convergence",
+        "seconds": 89.24497760300073
+      },
+      {
+        "component": "dual",
+        "seconds": 20.856070740999712
+      }
+    ],
+    "provenance": {
+      "code_hash": "5373ab0d65274212",
+      "config_hash": "a2d26416fe8a3fac",
+      "mode": "quick",
+      "environment": {
+        "python": "3.14.4",
+        "packages": {
+          "numpy": "2.5.4",
+          "scipy": "1.18.1",
+          "pandas": "2.3.3",
+          "matplotlib": "3.11.2",
+          "torch": "2.15.0+cpu",
+          "threadpoolctl": "3.7.0",
+          "ipykernel": "7.4.0"
+        }
+      }
+    },
+    "scope": "5D convergence at 1k/10k/50k, 3 seeds; paper-regime implementation check not tested",
+    "import_seconds": 3.3256779339990317,
+    "units": [
+      {
+        "id": "P1-checks",
+        "section": "checks",
+        "projected_s": 17.358771095998236
+      },
+      {
+        "id": "P1-put",
+        "section": "put",
+        "projected_s": 85.56219764639827
+      },
+      {
+        "id": "P1-convergence",
+        "section": "convergence",
+        "projected_s": 123.08478664439971
+      },
+      {
+        "id": "P1-dual",
+        "section": "dual",
+        "projected_s": 41.018098409998494
+      }
+    ],
+    "projection": {
+      "safety": 1.2,
+      "seconds": 267.0238537967947,
+      "limitation": "exact full section measurements; fresh-process imports and 10 s restart overhead per section; runtime variability unmeasured"
+    }
+  },
+  "preserved_sha256": {
+    "validation_lsm_convergence.csv": "451b83aa3473484bd96c21f5fda983adf0e0faf2fe83991944eda15d275e73d5",
+    "validation_lsm_convergence.png": "bb043ee13d204d110f90689e29634bf2e90ec2ab663758c8047a514c9c0729e0",
+    "validation_paper_check.json": "0b521dcccafbf5318ffa8b232c7fbe0681a62d0d6fa4809e1269df54d453f018",
+    "validation_put.csv": "203219a1ee9084263f74ca1bcabf5d55553ff05929385a744a6e70c1bbc2156c"
+  }
+}

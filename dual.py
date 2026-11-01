@@ -104,13 +104,16 @@ def policy_dual(opt, policy, *, outer=1000, inner=200, base_seed=2026,
 
 
 def nested_policy_dual(opt, policy, *, budgets, outer=2000, seed=912,
-                       group=200, memory_mb=256, guarded=True, max_seconds=None):
+                       group=200, memory_mb=256, guarded=True, max_seconds=None,
+                       outer_indices=None):
     """Common inner samples: each budget averages a prefix of IID groups.
 
     Each (outer index, date, group) has a distinct SeedSequence. Outer randomness
     uses a separate role. No future outer states enter the inner simulation.
     Processing one outer state bounds memory independently of the largest budget.
     Increasing budgets leaves every earlier sample bitwise unchanged.
+    outer_indices selects global indices from the fixed outer population; both
+    inner seeds and outer states match an unsplit run, including doubling subsets.
     Seed roles use the registered base 2026. value_gap estimates U-C_hat_0:
     its expectation is the same policy gap, often with much less outer noise
     than U-Z_tau. It retains inner bias and is not a pathwise bound.
@@ -131,7 +134,17 @@ def nested_policy_dual(opt, policy, *, budgets, outer=2000, seed=912,
     isd = seed_for(2026, 'dual_inner', opt.d, seed)
     if osd == isd:
         raise ValueError('seed collision')
-    paths = gbm_paths(opt, outer, seed=osd)
+    # Global outer indices also key inner streams: chunking and doubling never
+    # change the experiment. Generate the same outer population for each chunk.
+    indices = np.arange(outer) if outer_indices is None else np.asarray(outer_indices)
+    if (indices.ndim != 1 or len(indices) < 2 or
+        not np.issubdtype(indices.dtype, np.integer) or
+        np.any(indices < 0) or np.any(indices >= outer) or
+        np.any(np.diff(indices) <= 0)):
+        raise ValueError('outer_indices must be sorted distinct integers within outer')
+    paths = gbm_paths(opt, outer, seed=osd)[indices]
+    population = outer
+    outer = len(indices)
     z = opt.payoff(paths)*opt.discount(np.arange(opt.dates+1))
     lower = discounted_payoffs(opt, paths, policy, guarded)[0]
     c = np.empty((len(budgets), outer, opt.dates))
@@ -141,7 +154,7 @@ def nested_policy_dual(opt, policy, *, budgets, outer=2000, seed=912,
         for k in range(opt.dates):
             total = 0.
             for g in range(budgets[-1]//group):
-                rng = np.random.default_rng(np.random.SeedSequence([isd,a,k,g]))
+                rng = np.random.default_rng(np.random.SeedSequence([isd,int(indices[a]),k,g]))
                 total += continuation(opt, paths[a:a+1,k], k, policy, group, rng, guarded)[0]
                 n = (g+1)*group
                 if n in budgets:
@@ -155,9 +168,11 @@ def nested_policy_dual(opt, policy, *, budgets, outer=2000, seed=912,
             mart[:,k] = mart[:,k-1]+lk-c[i,:,k-1]
         u = np.max(z[:,1:]-mart[:,1:],axis=1)
         results.append(dict(upper=_summary(u), upper_samples=u,
-            lower=_summary(lower), gap=_summary(u-lower),
-            value_gap=_summary(u-c[i,:,0]), martingale_samples=mart,
+            lower=_summary(lower), lower_samples=lower, gap=_summary(u-lower),
+            value_gap=_summary(u-c[i,:,0]), value_gap_samples=u-c[i,:,0],
+            initial_value_samples=c[i,:,0].copy(), martingale_samples=mart,
             metadata=dict(outer=outer,inner=n,outer_seed=osd,inner_seed=isd,
-                          seed=seed,group=group,estimated_working_bytes=estimated_bytes,
+                          seed=seed,group=group,outer_population=population,
+                          outer_indices=indices.tolist(),estimated_working_bytes=estimated_bytes,
                           coupling='IID group prefix')))
     return results

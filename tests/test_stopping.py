@@ -248,5 +248,20 @@ class StorageTests(unittest.TestCase):
         with self.assertRaises(ValueError): reference_for(paper_max_call(10))
 
 
+class SharedTestUncertaintyTests(unittest.TestCase):
+    def test_perfectly_correlated_test_errors_do_not_shrink_with_seeds(self):
+        from stopping import absolute_gap_uncertainty
+        r = absolute_gap_uncertainty([0.1]*10, [0.04]*10)
+        self.assertAlmostEqual(r['shared_test_se_bound'], 0.04)
+        self.assertAlmostEqual(r['combined_ci_high']-0.1, 2.241402727604947*0.04)
+        # Bound dominates the exact SE for unequal scales under any correlation.
+        scales = np.array([0.02, 0.05, 0.08])
+        covariance = np.outer(scales, scales) * np.array([[1,.3,-.1],[.3,1,.2],[-.1,.2,1]])
+        exact = np.sqrt(covariance.sum())/3
+        self.assertGreaterEqual(absolute_gap_uncertainty([1,2,3], scales)['shared_test_se_bound'], exact)
+        with self.assertRaises(ValueError): absolute_gap_uncertainty([1], [0.1])
+        with self.assertRaises(ValueError): absolute_gap_uncertainty([1,2], [-.1,.1])
+
+
 if __name__=='__main__':
     unittest.main(verbosity=2)

@@ -679,10 +679,68 @@ def mean_ci(x, level=0.95):
     return m, se, m - h, m + h
 
 
+
+def absolute_gap_uncertainty(gaps, test_ses):
+    """Separate seed variation from shared-test error without assuming independence.
+
+    The mean individual test SE bounds the SE of the seed-average payoff by
+    Cauchy-Schwarz, even with arbitrary cross-policy covariance. Add 97.5%
+    marginal half-widths (Bonferroni) for an approximate conservative 95%
+    combined interval. Student-t/normal approximations are not coverage proofs;
+    reference uncertainty is reported separately and is not included here.
+    """
+    gaps = np.asarray(gaps, dtype=float)
+    test_ses = np.asarray(test_ses, dtype=float)
+    if (gaps.ndim != 1 or test_ses.shape != gaps.shape or len(gaps) < 2
+            or not np.isfinite(gaps).all() or not np.isfinite(test_ses).all()
+            or (test_ses < 0).any()):
+        raise ValueError("Need at least two finite gaps and matching nonnegative SEs")
+    mean, se, lo, hi = mean_ci(gaps)
+    seed_half = float(student_t.ppf(0.9875, len(gaps)-1) * se)
+    test_bound = float(test_ses.mean())
+    test_half = 2.241402727604947 * test_bound
+    return dict(seed_ci_low=lo, seed_ci_high=hi,
+                shared_test_se_bound=test_bound,
+                combined_ci_low=mean-seed_half-test_half,
+                combined_ci_high=mean+seed_half+test_half)
+
+
 def paired(a, b):
     """Paired Monte Carlo statistics for a - b on the SAME test paths (one seed)."""
     diff = np.asarray(a) - np.asarray(b)
     return float(diff.mean()), float(diff.std(ddof=1) / math.sqrt(len(diff)))
+
+
+
+def guard_diagnostic(opt: Option, paths, policy: Policy):
+    """Re-evaluate fixed date rules versus skipping that date on fresh paths.
+
+    The suffix uses the original guarded policy, just as during backward fitting.
+    All paths enter each date; these are local gains, not additive contributions
+    to the time-zero policy value. This diagnostic never changes any decision.
+    Validation gains are selected in-sample, especially for neural checkpoints;
+    fresh gains are conditional out-of-sample checks of the selected rules.
+    """
+    if len(paths) < 2:
+        raise ValueError("Guard diagnostics require at least two fresh paths")
+    rows = []
+    future = Backward(opt, paths)
+    for k in range(opt.dates - 1, 0, -1):
+        x = paths[:, k, :]
+        stop = exercise_mask(opt, policy, k, x, guarded=False)
+        gains = stop * (opt.payoff(x) - future.future(k)) * opt.discount(k)
+        mean = float(gains.mean())
+        se = float(gains.std(ddof=1) / math.sqrt(len(gains)))
+        rejected = bool(policy.guard.get(k, False))
+        rows.append(dict(date=k, guarded=rejected,
+                         validation_gain=policy.val_gain.get(k, np.nan),
+                         fresh_gain=mean, fresh_se=se,
+                         fresh_ci_low=mean - 1.96 * se,
+                         fresh_ci_high=mean + 1.96 * se,
+                         fresh_stop_share=float(stop.mean()),
+                         retained_fresh_gain=0.0 if rejected else mean))
+        future.update(k, exercise_mask(opt, policy, k, x, guarded=True))
+    return rows
 
 
 def paired_row(key, guarded, contrast, diff, se):
@@ -784,6 +842,22 @@ def calibration_provenance(mode: str) -> dict:
     return dict(code_hash=code_hash(), config_hash=stable_hash(CONFIG), mode=mode,
                 environment=dict(python=platform.python_version(), packages={p: version(p) for p in
                     ("numpy", "scipy", "pandas", "matplotlib", "torch", "threadpoolctl", "ipykernel")}))
+
+
+def load_study_settings(path, mode):
+    """Keep stale calibration evidence; only smoke runs may use defaults."""
+    path = Path(path)
+    expected = calibration_provenance(mode)
+    frozen = json.loads(path.read_text()) if path.exists() else None
+    if frozen is not None and frozen.get("provenance") == expected:
+        return frozen
+    reason = "stale provenance" if frozen is not None else "missing frozen settings"
+    if mode != "quick":
+        raise RuntimeError(f"Frozen calibration {reason}; use a matching full-run namespace.")
+    print(f"WARNING: quick smoke only: {reason}; using CONFIG nn_settings; existing file preserved.")
+    return dict(neural=asdict(NeuralSettings(**CONFIG[mode]["validation"]["nn_settings"])),
+                provenance=expected, settings_source="CONFIG quick fallback: " + reason,
+                development_cost_cpu_minutes=float("nan"), not_saturated_cells={})
 
 
 def calibration_path(out: Path, mode: str) -> Path:
