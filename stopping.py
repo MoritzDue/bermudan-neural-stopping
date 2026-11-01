@@ -164,8 +164,26 @@ class Option:
     dates: int = 9               # exercise at t_k = k*T/dates, k = 1..dates
 
     def __post_init__(self):
+        """Reject invalid contracts before they enter simulation or backward induction.
+
+        Zero volatility is allowed for deterministic simulation controls; lattice
+        and convolution reference methods require strictly positive volatility.
+        """
         if self.kind not in ("put", "max_call"):
             raise ValueError("kind must be 'put' or 'max_call'")
+        if not isinstance(self.d, (int, np.integer)) or isinstance(self.d, (bool, np.bool_)) or self.d < 1:
+            raise ValueError("d must be a positive integer")
+        if not isinstance(self.dates, (int, np.integer)) or isinstance(self.dates, (bool, np.bool_)) or self.dates < 1:
+            raise ValueError("dates must be a positive integer")
+        for name in ("s0", "strike", "maturity"):
+            value = getattr(self, name)
+            if not np.isfinite(value) or value <= 0:
+                raise ValueError(f"{name} must be finite and strictly positive")
+        for name in ("rate", "dividend", "sigma", "rho"):
+            if not np.isfinite(getattr(self, name)):
+                raise ValueError(f"{name} must be finite")
+        if self.sigma < 0:
+            raise ValueError("sigma must be nonnegative")
         if self.kind == "put" and self.d != 1:
             raise ValueError("the put is one-dimensional")
         if self.d > 1 and not (-1 / (self.d - 1) < self.rho < 1):
@@ -224,7 +242,14 @@ def gbm_paths(opt: Option, n: int, seed=None, rng=None) -> np.ndarray:
 
 
 def crr_bermudan_put(opt: Option, steps_per_date: int = 160) -> float:
-    """Cox-Ross-Rubinstein tree; every exercise date lies on the tree grid."""
+    """Cox-Ross-Rubinstein put reference with exercise dates aligned to the grid.
+
+    This is a positive-volatility numerical reference, not a certified bound.
+    """
+    if opt.kind != "put" or opt.sigma <= 0:
+        raise ValueError("CRR reference requires a positive-volatility 1D put")
+    if not isinstance(steps_per_date, (int, np.integer)) or steps_per_date < 1:
+        raise ValueError("steps_per_date must be a positive integer")
     steps = steps_per_date * opt.dates
     dt = opt.maturity / steps
     up = math.exp(opt.sigma * math.sqrt(dt))
@@ -251,6 +276,8 @@ def convolution_bermudan_put(opt: Option, spacing: float = 0.0005) -> float:
     from scipy.signal import fftconvolve
     if opt.kind != "put" or opt.sigma <= 0:
         raise ValueError("requires a positive-volatility 1D put")
+    if not np.isfinite(spacing) or spacing <= 0:
+        raise ValueError("spacing must be finite and strictly positive")
     n = int(math.ceil(3 / spacing))
     x = np.arange(-n, n + 1) * spacing
     sd = opt.sigma * math.sqrt(opt.dt)
