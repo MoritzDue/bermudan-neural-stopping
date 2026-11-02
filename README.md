@@ -77,7 +77,9 @@ python make_figures.py
 The last command regenerates the two figures **from committed CSVs**, without running simulations. The notebooks on this branch default to quick smoke tests, not the full study.
 
 The original frozen study is preserved at [`study-v1`](https://github.com/MoritzDue/bermudan-neural-stopping/tree/study-v1). Its archived execution has a disclosed source-hash mismatch, and the full run cannot currently be reproduced directly from this branch without additional local checkpoints and archival tooling. The committed figures and summary data remain available for inspection; see [reproducibility details](RESEARCH_NOTES.md#reproducibility-and-scope).
+## Development
 
+I built an initial simplified version based on *Deep Optimal Stopping*. Claude and Codex assisted with extending the implementation. I defined the research question and scope, made the study-design and compute-budget decisions, and reviewed the results at each step.
 ## References
 
 - Becker, S., Cheridito, P., & Jentzen, A. (2019). [*Deep Optimal Stopping*](https://jmlr.org/papers/v20/18-232.html). *Journal of Machine Learning Research*, 20(74).
