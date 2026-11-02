@@ -6,7 +6,7 @@ All paths are simulated under risk-neutral geometric Brownian motion. This is a 
 
 ## Results
 
-Both methods are evaluated on the same 200,000 held-out paths. Each training budget is repeated with ten training seeds; LSM's regression settings are selected on validation paths, while the neural training settings are fixed.
+Both methods are evaluated on the same 200,000 held-out paths. Each training budget is repeated with ten training seeds; LSM's regression settings are selected on validation paths, while the neural training settings are fixed. Each seed also uses 5,000 validation paths, separate from the stated training budget and the shared test set.
 
 | Training paths per seed | Neural − LSM | 95% CI across seeds |
 |---:|---:|---:|
