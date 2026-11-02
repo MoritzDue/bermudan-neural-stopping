@@ -20,6 +20,8 @@ Conventions
   * Policy values are averages of discounted realised payoffs on independent paths,
     so in population every reported value is a LOWER bound for the true price.
   * gap = reference - policy value (positive = shortfall).
+  * Finite-sample policy estimates need not themselves lie below the true price:
+    the lower-bound statement concerns the population expectation.
 """
 from __future__ import annotations
 
@@ -209,9 +211,13 @@ def seed_for(base: int, role: str, d: int, seed: int = 0, extra: int = 0) -> int
 
 
 def gbm_paths(opt: Option, n: int, seed=None, rng=None) -> np.ndarray:
-    """Exact joint GBM transitions, array of shape (n, dates+1, d).
-    With a fixed seed, the first m rows of gbm_paths(n) equal gbm_paths(m) for m < n,
-    so training sets of different budgets within one seed are nested."""
+    """Simulate exact risk-neutral GBM steps, shape (n, dates+1, d).
+
+    Each asset has drift r - dividend and volatility sigma; the equicorrelation
+    matrix couples Brownian shocks across assets, not across simulation paths.
+    With a fixed seed, the first m rows of gbm_paths(n) equal gbm_paths(m) for
+    m < n, so training sets of different budgets within a seed are nested.
+    """
     rng = np.random.default_rng(seed) if rng is None else rng
     corr = np.full((opt.d, opt.d), opt.rho)
     np.fill_diagonal(corr, 1.0)
@@ -371,8 +377,12 @@ def discounted_payoffs(opt: Option, paths, policy: Policy, guarded=True, chunk=5
 
 
 class Backward:
-    """Realised cash flows under the already-fitted LATER policy (backward induction).
-    future(k) is the cash flow discounted to t_k of continuing at date k."""
+    """Realised cash flows under the already-fitted LATER stopping policy.
+
+    Backward induction first fixes decisions at later exercise dates. At date k,
+    future(k) is therefore the realised continuation cash flow discounted to t_k,
+    not an estimate formed using future information available to the policy.
+    """
 
     def __init__(self, opt: Option, paths):
         self.opt, self.paths = opt, paths
@@ -455,8 +465,14 @@ class RidgeRegression:
 
 
 def fit_lsm(opt: Option, train, val, degree: int, ridge: float) -> Policy:
-    """Backward LSM: regress realised continuation cash flows on in-the-money paths;
-    exercise iff payoff >= estimated continuation value. Guard per date on validation."""
+    """Fit a date-by-date Longstaff-Schwartz stopping policy.
+
+    On in-the-money training states, regress realised continuation cash flows
+    against polynomial state features, then stop when immediate payoff exceeds
+    predicted continuation value. The separate validation set decides whether
+    each exercise rule is retained; its gain is a selection signal, not an
+    unbiased estimate of out-of-sample performance.
+    """
     policy = Policy(method="lsm", info=dict(degree=degree, ridge=ridge))
     tr, va = Backward(opt, train), Backward(opt, val)
     n_cols = polynomial(lsm_features(train[:2, 1, :], opt), degree).shape[1]
@@ -523,6 +539,12 @@ def with_variant(settings: NeuralSettings, variant: str) -> NeuralSettings:
 
 
 def nn_features(x: np.ndarray, opt: Option, s: NeuralSettings) -> np.ndarray:
+    """Build dimensionless inputs for the exercise network.
+
+    Sorting makes the representation permutation-invariant for a symmetric
+    max-call. Adding the payoff exposes an economically relevant nonlinear
+    feature, but does not introduce information absent from the state itself.
+    """
     z = np.log(x / opt.strike)
     if s.sorted_inputs and opt.d > 1:
         z = np.sort(z, axis=1)                  # permutation-invariant representation
@@ -567,9 +589,14 @@ class NeuralRule:
 
 
 def _train_one_date(opt, k, s, sampler, Xv, Av, n_val, mu, sd, a_scale, seed):
-    """Maximise the soft stopping reward mean(p * (g - future)) with Adam for a fixed
-    number of steps. Checkpoints are scored by the HARD validation gain; the best
-    checkpoint is kept. Returns (net, best_gain, best_step, curve)."""
+    """Maximise the soft stopping reward mean(p * (g - future)) with Adam.
+
+    The sigmoid supplies a differentiable training objective, while the final
+    decision is hard (logit >= 0). Checkpoints are ranked by the hard stopping
+    gain on validation paths; reusing those paths to select and guard rules
+    makes validation gains optimistic and unsuitable as reported policy values.
+    Returns (net, best_gain, best_step, curve).
+    """
     torch.manual_seed(seed)
     net = StopNet(Xv.shape[1], opt.d + s.width_extra, s.batch_norm)
     adam = torch.optim.Adam(net.parameters(), lr=s.lr)
@@ -601,11 +628,15 @@ def _train_one_date(opt, k, s, sampler, Xv, Av, n_val, mu, sd, a_scale, seed):
 
 
 def fit_neural(opt: Option, train, val, settings: NeuralSettings, seed: int) -> Policy:
-    """Backward induction over exercise dates. At each date a fresh network is trained
-    on in-the-money states (out of the money, stopping pays 0 <= continuing, so these
-    states carry no information for the objective). With settings.fresh_paths=True
-    the training set is ignored and a new batch of paths is simulated at every step,
-    as in the paper."""
+    """Fit independent date-specific networks by backward induction.
+
+    Training uses only in-the-money states: exercise gives zero out of the money
+    and cannot improve upon a nonnegative continuation value there. Earlier-date
+    targets follow the guarded later policy; they are not oracle continuation
+    values. With fresh_paths=True, simulate a new training batch at every step
+    instead of resampling the fixed training set. An independent test set must
+    evaluate the fitted, validation-selected stopping policy.
+    """
     s = settings
     policy = Policy(method=f"nn_{s.variant}", info=asdict(s))
     va = Backward(opt, val)
@@ -761,9 +792,15 @@ ABLATION_CONTRASTS = {   # each is a linear combination of per-path payoffs
 
 def run_unit(opt: Option, n_train: int, seed: int, variants, settings: NeuralSettings,
              n_val: int, test_paths, reference: dict, base_seed: int, budget_label=None):
-    """Fit LSM and every requested neural variant on the SAME training and validation
-    paths of this seed, evaluate all of them (guarded and unguarded) on the SAME test
-    paths, and return tidy rows. Nothing here selects anything using test paths."""
+    """Fit and evaluate a paired comparison for one budget and training seed.
+
+    LSM and every neural variant share that seed's training and validation
+    paths. Guarded and unguarded policies then use the same independent test
+    paths, reducing paired-difference Monte Carlo variance. Reusing this test
+    set across different seeds does NOT make their evaluation errors independent;
+    across-seed intervals are conditional on the realised test sample.
+    No test paths are used to select policy settings or rules.
+    """
     case = opt.name
     t0 = time.perf_counter()
     train = gbm_paths(opt, n_train, seed_for(base_seed, "train", opt.d, seed))
@@ -821,9 +858,12 @@ def stable_hash(value) -> str:
 
 
 def code_hash() -> str:
-    """Hash all project Python modules and notebook code cells, not prose/outputs.
+    """Fingerprint source files and notebook code cells for experiment provenance.
 
-    Includes filenames; excludes tests, caches and temporary notebook copies.
+    Module files are hashed byte-for-byte, so changing even comments or
+    docstrings changes this identifier and can invalidate saved calibration
+    provenance. Notebook markdown and outputs are excluded, as are tests,
+    caches and temporary notebook copies.
     """
     digest = hashlib.sha256()
     for path in sorted(PROJECT_ROOT.glob("*.py")):
