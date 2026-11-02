@@ -1,10 +1,21 @@
-"""Shared notebook-01 sections; full timing uses these exact functions and assertions."""
+"""Method-validation sections shared by notebook 01.
+
+These checks test risk-neutral simulation, reference agreement, exercise-time
+discounting and dual-estimator behaviour. They are implementation diagnostics,
+not proofs of model correctness or confidence guarantees for every run.
+"""
 import json, time
 import numpy as np, pandas as pd, matplotlib.pyplot as plt
 from IPython.display import display
 from stopping import *
 
 def validation_checks():
+    """Check GBM moments, CRR refinement and discounting against independent controls.
+
+    Statistical moment checks have finite-sample tolerance; the CRR/convolution
+    discrepancy is a heuristic numerical grid band rather than a certified
+    pricing error bound.
+    """
     put = validation_put()
     x = gbm_paths(put, 50_000, seed=1)
     expected = put.s0 * np.exp((put.rate - put.dividend) * put.maturity)
@@ -94,6 +105,11 @@ def validation_convergence(MODE, cfg, BASE, OUT, CHECK_SEED):
     return locals()
 
 def validation_paper(cfg, BASE, OUT, CHECK_SEED):
+    """Check a paper-style fresh-path fit against the published 5D benchmark.
+
+    Agreement is a consistency diagnostic only: it cannot independently
+    establish implementation correctness or optimality of the neural policy.
+    """
     opt = paper_max_call(5)
     ref = reference_for(opt)
     test5 = gbm_paths(opt, cfg["test"], seed_for(BASE, "check", 5, extra=1))  # NOT the main-study test set
