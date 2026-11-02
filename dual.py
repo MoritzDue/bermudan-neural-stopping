@@ -1,7 +1,13 @@
 """Nested policy-value dual, following Andersen & Broadie (2004),
 Management Science 50(9), 1222–1234, doi:10.1287/mnsc.1040.0258.
 
-For the outer GBM filtration F_k let Z_k=discount(k)*g(S_k),
+In one paragraph: any stopping policy gives a LOWER bound on the Bermudan
+price. Subtracting a martingale built from that policy's own continuation
+values and taking the pathwise maximum gives an UPPER bound (Rogers 2002;
+Haugh & Kogan 2004). The distance between the two measures how far the policy
+is from optimal; the better the policy, the tighter the bracket.
+
+Derivation. For the outer GBM filtration F_k let Z_k=discount(k)*g(S_k),
 C_k=E[Z_tau(k+1)|F_k], L_k=Z_k on a policy stop, else C_k,
 and L_N=Z_N. Then E[L_(k+1)|F_k]=C_k. Thus M_0=0 and
 M_(k+1)-M_k=L_(k+1)-C_k define a martingale. For any stopping
@@ -20,8 +26,7 @@ a guaranteed upper bound. Outer CIs describe sampling error around the
 finite-inner expectation; they do not remove inner bias.
 
 Policies must be fixed deterministic state rules, trained independently
-of these paths. No inner estimate is used to decide exercise. Primary
-paper verification is pending offline source access.
+of these paths. No inner estimate is used to decide exercise.
 """
 import time
 import numpy as np
@@ -101,9 +106,12 @@ def policy_dual(opt, policy, *, outer=1000, inner=200, base_seed=2026,
             rng = np.random.default_rng(np.random.SeedSequence([isd, block, k]))
             c[:, k] = continuation(opt, paths[:, k], k, policy, inner, rng, guarded)
         for k in range(1, opt.dates+1):
+            # L_k = Z_k if the policy stops at k, else C_k (so continuing dates
+            # telescope exactly and add no inner noise).
             lk = z[:, k] if k == opt.dates else np.where(
                 exercise_mask(opt, policy, k, paths[:, k], guarded), z[:, k], c[:, k])
-            mart[a:b, k] = mart[a:b, k-1]+lk-c[:, k-1]
+            mart[a:b, k] = mart[a:b, k-1]+lk-c[:, k-1]     # M_k - M_{k-1} = L_k - C_{k-1}
+        # Dual: max over exercise dates of discounted payoff minus martingale.
         upper[a:b] = np.max(z[:, 1:]-mart[a:b, 1:], axis=1)
     return dict(upper=_summary(upper), lower=_summary(lower), gap=_summary(upper-lower),
                 martingale=_summary(mart), increments=_summary(np.diff(mart, axis=1)),

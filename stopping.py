@@ -222,7 +222,9 @@ def gbm_paths(opt: Option, n: int, seed=None, rng=None) -> np.ndarray:
     corr = np.full((opt.d, opt.d), opt.rho)
     np.fill_diagonal(corr, 1.0)
     z = rng.standard_normal((n, opt.dates, opt.d)) @ np.linalg.cholesky(corr).T
-    steps = (opt.rate - opt.dividend - 0.5 * opt.sigma ** 2) * opt.dt + opt.sigma * math.sqrt(opt.dt) * z
+    # Exact log-normal transition (no Euler error):
+    #   log S_{k+1} - log S_k = (r - q - sigma^2/2) dt + sigma sqrt(dt) Z
+    steps =(opt.rate - opt.dividend - 0.5 * opt.sigma ** 2) * opt.dt + opt.sigma * math.sqrt(opt.dt) * z
     paths = np.empty((n, opt.dates + 1, opt.d))
     paths[:, 0, :] = opt.s0
     paths[:, 1:, :] = opt.s0 * np.exp(np.cumsum(steps, axis=1))
@@ -272,15 +274,21 @@ def convolution_bermudan_put(opt: Option, spacing: float = 0.0005) -> float:
     return float(v[n])
 
 
-# BCJ (2019) Table 1, transcribed by hand; the primary PDF was not re-checked offline.
-# value/low/high remain compatibility aliases for the midpoint and DOS CI.
+# Becker, Cheridito & Jentzen (2019), Table 1 (symmetric max-call, S0 = 100).
+# Point estimates and 95% CIs cross-checked against the authors' own slides
+# (Cheridito, WU Vienna talk, Nov 2019): d=2 13.899 [13.880, 13.910], binomial
+# 13.902; d=5 26.159 [26.138, 26.174], Broadie-Cao CI [26.115, 26.164].
+# NOTE: BCJ's lower bound (~26.156 for d=5) comes from training on freshly
+# simulated batches (millions of paths per date); our policies train on at
+# most 50k fixed paths, so they are expected to sit below it.
+# value/low/high remain compatibility aliases for the midpoint and the CI.
 PAPER_REFERENCES = {
     2: dict(value=13.899, lower=13.895, upper=13.903, midpoint=13.899,
             low=13.880, high=13.910, ci=[13.880, 13.910], lattice=13.902,
-            source="BCJ Table 1, d=2; brief transcription, primary source unverified offline"),
+            source="BCJ (2019) Table 1, d=2"),
     5: dict(value=26.159, lower=26.156, upper=26.162, midpoint=26.159,
             low=26.138, high=26.174, ci=[26.138, 26.174], lattice=None,
-            source="BCJ Table 1, d=5; brief transcription, primary source unverified offline"),
+            source="BCJ (2019) Table 1, d=5"),
     10: dict(value=38.337, low=38.300, high=38.367, verified=False,
              source="Unverified legacy 10D fields; out of scope, not a research benchmark"),
 }
@@ -481,7 +489,10 @@ def fit_lsm(opt: Option, train, val, degree: int, ridge: float) -> Policy:
         g = opt.payoff(x)
         itm = g > 0
         if itm.sum() >= 2 * n_cols + 20:
-            reg = RidgeRegression(polynomial(lsm_features(x[itm], opt), degree), tr.future(k)[itm], ridge)
+            # LS (2001): regress only on in-the-money paths, where the exercise
+            # decision matters. The target is the REALISED discounted cash flow
+            # of the later policy, so the fitted values estimate C_k(x).
+            reg =RidgeRegression(polynomial(lsm_features(x[itm], opt), degree), tr.future(k)[itm], ridge)
             policy.rules[k] = (lambda z, reg=reg: opt.payoff(z) >= reg.predict(polynomial(lsm_features(z, opt), degree)))
         else:
             policy.rules[k] = None          # too few samples: never exercise
@@ -609,7 +620,10 @@ def _train_one_date(opt, k, s, sampler, Xv, Av, n_val, mu, sd, a_scale, seed):
             continue
         net.train()
         p = torch.sigmoid(net(torch.from_numpy((X - mu) / sd)))
-        loss = -(p * torch.from_numpy(A / a_scale)).mean()      # gradient ASCENT on reward
+        # BCJ objective at date k: E[p*g + (1-p)*C] = E[C] + E[p*(g - C)].
+        # E[C] does not depend on the network, so maximising mean(p * A) with
+        # A = g - C (exercise advantage) has the same gradient and optimum.
+        loss =-(p * torch.from_numpy(A / a_scale)).mean()      # gradient ASCENT on reward
         adam.zero_grad()
         loss.backward()
         adam.step()

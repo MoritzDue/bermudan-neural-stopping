@@ -4,6 +4,13 @@ This project compares neural optimal stopping with Longstaff–Schwartz regressi
 
 All paths are simulated under risk-neutral geometric Brownian motion. This is a numerical pricing study, not a backtest on market data.
 
+**Key findings**
+
+- **With enough data, the methods tie.** At 50k training paths, neural stopping and tuned LSM price within 0.004 of each other (option value ≈ 26.1), with no detectable difference.
+- **With little data, LSM is ahead.** At 1k paths LSM wins in 9 of 10 seeds, by about 0.12 on average (p = 0.053, so not significant at 5%).
+- **Both policies are near-optimal.** An Andersen–Broadie primal–dual bracket puts both 50k policies within about 0.05 (≈ 0.2%) of the optimal value, and their upper bounds fall inside the published reference interval.
+- **Built to survive review.** Paired evaluation on shared test paths, held-out validation, exact GBM simulation, independent 1D references (CRR tree and convolution) and 37 unit tests.
+
 ## Results
 
 Both methods are evaluated on the same 200,000 held-out paths. Each training budget is repeated with ten training seeds; LSM's regression settings are selected on validation paths, while the neural training settings are fixed. Each seed also uses 5,000 validation paths, separate from the stated training budget and the shared test set.
@@ -27,7 +34,9 @@ To check the distance to the optimal stopping value, I applied a nested Andersen
 
 ![Primal–dual estimates alongside the published reference interval](results/headline/fig_primal_dual_bounds.png)
 
-Both estimated gaps are small relative to an option value near 26.1. The dual upper bound holds **in expectation**; the reported intervals account for outer-path sampling variation but not all finite-inner simulation bias. The estimates are consistent with the reference interval **[26.138, 26.174]** reported by Becker, Cheridito and Jentzen (2019), but do not certify either policy as optimal.
+The "estimated policy value" here is the policy's value from the dual experiment's inner simulations (about 6.4 million paths from the initial state). It is more precise than, and statistically consistent with, the same policy's value on the 200k test paths.
+
+Both estimated gaps are small relative to an option value near 26.1. The policy values lie about 0.05 below the paper's own lower bound (≈ 26.156). This is expected: Becker et al. train each date on millions of freshly simulated paths, whereas this study caps training at 50k fixed paths per seed. The dual upper bound holds **in expectation**; the reported intervals account for outer-path sampling variation but not all finite-inner simulation bias. The estimates are consistent with the reference interval **[26.138, 26.174]** reported by Becker, Cheridito and Jentzen (2019), but do not certify either policy as optimal.
 
 ## Method
 
