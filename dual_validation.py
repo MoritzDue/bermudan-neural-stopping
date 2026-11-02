@@ -1,4 +1,9 @@
-"""Bounded validation experiments for the dual estimator; smoke evidence, not the full study.
+"""Diagnostic experiments for the nested primal-dual estimator.
+
+The size sweeps, conditional-drift checks and numerical oracles assess whether
+the simulated estimator behaves consistently with its theoretical properties.
+They are not themselves formal convergence certificates. Outputs are treated
+as smoke or development evidence, separate from the frozen research results.
 
 Run with the project interpreter. Output is JSON on stdout; no cached evidence
 is overwritten. Main-study sizes remain unset unless all budget gates pass.
