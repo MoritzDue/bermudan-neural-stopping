@@ -9,7 +9,7 @@ All paths are simulated under risk-neutral geometric Brownian motion. This is a 
 - **With enough data, the methods tie.** At 50k training paths, neural stopping and tuned LSM price within 0.004 of each other (option value ≈ 26.1), with no detectable difference.
 - **With little data, LSM is ahead.** At 1k paths LSM wins in 9 of 10 seeds, by about 0.12 on average (p = 0.053, so not significant at 5%).
 - **Both policies are near-optimal.** An Andersen–Broadie primal–dual bracket puts both 50k policies within about 0.05 (≈ 0.2%) of the optimal value, and their upper bounds fall inside the published reference interval.
-- **Built to survive review.** Paired evaluation on shared test paths, held-out validation, exact GBM simulation, independent 1D references (CRR tree and convolution) and 37 unit tests.
+- **Evaluation design.** Paired evaluation on shared test paths, held-out validation, exact GBM simulation, independent 1D references (CRR tree and convolution) and 37 unit tests.
 
 ## Results
 
