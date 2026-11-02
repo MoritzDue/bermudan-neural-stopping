@@ -2,13 +2,13 @@
 import unittest
 import numpy as np
 from stopping import validation_put, crr_bermudan_put
-from dual_validation import (crr_boundary_policy, independent_gap,
+from tools.dual_validation import (crr_boundary_policy, independent_gap,
                              budget_diagnostic, terminal_drift_decomposition)
 from dual import policy_dual, _summary
 from stopping import Policy
 
 
-from dual_validation import grid_inner_error
+from tools.dual_validation import grid_inner_error
 
 
 class ValidationTests(unittest.TestCase):
@@ -107,7 +107,7 @@ if __name__=='__main__': unittest.main()
 
 class CumulativeSizingTests(unittest.TestCase):
     def test_persistent_small_drops_and_largest_rejected(self):
-        from dual_validation import cumulative_sizing_rows
+        from tools.dual_validation import cumulative_sizing_rows
         x=np.array([-.02,0.,.02])
         results=[dict(metadata=dict(inner=n),upper=_summary(x+b),upper_samples=x+b)
                  for n,b in zip((800,1600,3200,6400),(0.024,0.016,0.008,0.))]
@@ -120,7 +120,7 @@ class CumulativeSizingTests(unittest.TestCase):
         self.assertLess(rows[0]['cumulative_drop']['se'],1e-16)
 
     def test_invalid_cumulative_comparisons_rejected(self):
-        from dual_validation import cumulative_sizing_rows
+        from tools.dual_validation import cumulative_sizing_rows
         def result(n, size=3):
             x = np.arange(size, dtype=float)
             return dict(metadata=dict(inner=n), upper=_summary(x), upper_samples=x)
@@ -130,7 +130,7 @@ class CumulativeSizingTests(unittest.TestCase):
                 cumulative_sizing_rows(results)
 
     def test_followup_rejects_nonquick_output_before_writing(self):
-        from dual_validation import run_cumulative_followup
+        from tools.dual_validation import run_cumulative_followup
         with self.assertRaises(ValueError):
             run_cumulative_followup(preflight_only=True, output_dir='results/full/forbidden')
 
@@ -139,7 +139,7 @@ class BlockCheckpointTests(unittest.TestCase):
         import tempfile
         from pathlib import Path
         from unittest.mock import patch
-        from dual_validation import checkpoint_sizing
+        from tools.dual_validation import checkpoint_sizing
         calls=[]
         def fake(option,policy,**kw):
             calls.append(kw['seed'])
@@ -164,7 +164,7 @@ class BlockCheckpointTests(unittest.TestCase):
         import tempfile
         from pathlib import Path
         from unittest.mock import patch
-        from dual_validation import checkpoint_sizing
+        from tools.dual_validation import checkpoint_sizing
         manifest=dict(evaluation_seed=96301,outer=12,group=8,budgets=[8,16])
         good=[dict(upper_samples=np.arange(3.))]*2
         with tempfile.TemporaryDirectory() as directory:
@@ -181,7 +181,7 @@ class BlockCheckpointTests(unittest.TestCase):
         import tempfile
         from pathlib import Path
         from unittest.mock import patch
-        from dual_validation import checkpoint_sizing
+        from tools.dual_validation import checkpoint_sizing
         manifest = dict(evaluation_seed=96301, outer=12, group=8, budgets=[8,16])
         original = signal.getsignal(signal.SIGTERM)
         def terminate(*args, **kwargs):

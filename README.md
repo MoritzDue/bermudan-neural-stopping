@@ -60,6 +60,7 @@ The full-study comparison covers the five-dimensional case. The proposed two-dim
 | [`03_main_study.ipynb`](03_main_study.ipynb) | Experimental design and interpretation |
 | [`results/`](results/) | Figures, summary tables and supporting records; see the [file index](results/README.md) |
 | [`tests/`](tests/) | Unit tests |
+| [`tools/`](tools/) | Primal–dual sizing and diagnostic scripts used while developing the dual experiment |
 
 ## Running the checks
 

@@ -5,7 +5,7 @@ the simulated estimator behaves consistently with its theoretical properties.
 They are not themselves formal convergence certificates. Outputs are treated
 as smoke or development evidence, separate from the frozen research results.
 
-Run with the project interpreter. Output is JSON on stdout; no cached evidence
+Run from the repository root (e.g. python -c "from tools.dual_validation import ..."). Output is JSON on stdout; no cached evidence
 is overwritten. Main-study sizes remain unset unless all budget gates pass.
 """
 import json
@@ -200,7 +200,7 @@ def run_correction(outer=2000):
     neural = fit_neural(opt, train, val, settings, seed=seed('init',5,910))
     report = dict(kind='dual sizing smoke evidence; not full-study findings', outer=outer,
                   source_sha256={p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
-                                 for p in ('stopping.py','dual.py','dual_validation.py')},
+                                 for p in ('stopping.py','dual.py','tools/dual_validation.py')},
                   seed_protocol='base 2026; train/val/init extra 910; dual seed 911',
                   neural_settings=vars(settings), policies={},
                   criterion_changes_pending_review=[
@@ -281,7 +281,7 @@ def run_revision_confirmation():
     from stopping import (validation_put, paper_max_call, gbm_paths, select_lsm,
                           Policy, exercise_mask, fit_neural, NeuralSettings, limit_threads, seed_for)
     from dual import policy_dual, nested_policy_dual, _summary
-    from dual_validation import crr_boundary_policy, grid_inner_error, conditional_drift
+    from tools.dual_validation import crr_boundary_policy, grid_inner_error, conditional_drift
     limit_threads(1)
     out=Path('results/quick/m3-validation')
     manifest=json.loads((out/'revision-manifest.json').read_text())
@@ -402,7 +402,7 @@ def run_revision_put_sizing():
     import numpy as np
     from stopping import validation_put, limit_threads, gbm_paths, discounted_payoffs, reference_for
     from dual import nested_policy_dual,_summary
-    from dual_validation import crr_boundary_policy,independent_gap
+    from tools.dual_validation import crr_boundary_policy,independent_gap
     limit_threads(1)
     out=Path('results/quick/m3-validation')
     def save(name,r):
@@ -472,7 +472,7 @@ def run_cumulative_followup(preflight_only=False, output_dir="results/quick/m3-v
     from dual import nested_policy_dual
     import hashlib
     out = Path(output_dir)
-    if not out.resolve().is_relative_to((Path(__file__).resolve().parent/'results/quick').resolve()):
+    if not out.resolve().is_relative_to((Path(__file__).resolve().parents[1]/'results/quick').resolve()):
         raise ValueError('sizing evidence must stay under results/quick')
     out.mkdir(parents=True, exist_ok=True)
     def save(name, value):
@@ -488,7 +488,7 @@ def run_cumulative_followup(preflight_only=False, output_dir="results/quick/m3-v
         neural=asdict(NeuralSettings(max_steps=1500,lr=.001,batch=256)),
         limitations='Largest prefix is not an oracle. No extrapolation. Fresh evaluation seed after adaptation. Quick validation only.')
     manifest['source_sha256'] = {name: hashlib.sha256(Path(name).read_bytes()).hexdigest()
-                                 for name in ('stopping.py','dual.py','dual_validation.py')}
+                                 for name in ('stopping.py','dual.py','tools/dual_validation.py')}
     manifest_path = out/'followup-manifest.json'
     if manifest_path.exists():
         if json.loads(manifest_path.read_text()) != manifest:
