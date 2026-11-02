@@ -57,6 +57,12 @@ Reference: Becker et al. (2019) report a 95% interval of [26.138, 26.174] for th
   The neural settings were fixed, not optimised.
 - Results hold for these implementations, budgets and one machine.
 
+## Reading guide
+
+For a quick research overview, read **Question → Results → Method → Limitations** below, then inspect `03_main_study.ipynb` for the study design and interpretation. For implementation details, start with `stopping.py` (simulation, LSM, neural stopping, out-of-sample evaluation), continue with `dual.py` (nested primal–dual estimates), and use `01_method_validation.ipynb` plus `tests/` to see what the numerical checks establish. `02_calibration_and_preflight.ipynb` documents the development workflow; its committed quick-mode runs should not be interpreted as completed full-study calibration.
+
+**Reproduction boundary.** The figures can be regenerated from committed summaries without rerunning simulation. The research results themselves come from the historical `study-v1` workflow, which contains the frozen manifest and archival tooling. That version's README also records an execution-provenance hash discrepancy and a limitation in the strict runner's summary regeneration; consult those notes before claiming end-to-end reproduction. Even comment-only edits to Python modules change the project's source hash, so the historical result provenance must continue to refer to its original version.
+
 ## Repository
 
 ```
