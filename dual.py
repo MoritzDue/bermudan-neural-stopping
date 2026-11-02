@@ -29,7 +29,13 @@ from stopping import gbm_paths, exercise_mask, discounted_payoffs, seed_for
 
 
 def continuation(opt, states, k, policy, inner, rng, guarded=True):
-    """Independent continuations from t_k; stream states, not path tensors."""
+    """Estimate discounted continuation via independent conditional rollouts.
+
+    Each outer state is replicated across inner paths. Only simulated
+    post-k shocks enter future stopping decisions, and cash flows are
+    discounted to time zero. This targets the fixed policy's continuation,
+    not optimal continuation.
+    """
     x = np.repeat(states, inner, axis=0)
     pay = np.zeros(len(x))
     alive = np.ones(len(x), dtype=bool)
@@ -56,7 +62,12 @@ def _summary(x):
 
 def policy_dual(opt, policy, *, outer=1000, inner=200, base_seed=2026,
                 seed=0, outer_chunk=32, memory_mb=256, guarded=True):
-    """Return paired primal/dual samples, 95% normal CIs and M_k statistics.
+    """Return paired policy payoffs, finite-inner dual estimates and diagnostics.
+
+    The expected dual maximum is an upper bound for an independently fixed
+    policy; an individual sample or confidence endpoint is not guaranteed
+    to bound the true price. A paired difference reduces outer sampling
+    noise but does not remove inner-simulation bias.
 
     memory_mb caps a conservative working-array estimate, not process RSS or
     arbitrary policy inference allocations. The caller must measure process RSS.
@@ -106,7 +117,10 @@ def policy_dual(opt, policy, *, outer=1000, inner=200, base_seed=2026,
 def nested_policy_dual(opt, policy, *, budgets, outer=2000, seed=912,
                        group=200, memory_mb=256, guarded=True, max_seconds=None,
                        outer_indices=None):
-    """Common inner samples: each budget averages a prefix of IID groups.
+    """Evaluate nested inner budgets on coupled simulation streams.
+
+    Coupling improves precision of comparisons between budgets, but does not
+    eliminate the finite-inner upward bias of the upper estimator.
 
     Each (outer index, date, group) has a distinct SeedSequence. Outer randomness
     uses a separate role. No future outer states enter the inner simulation.
